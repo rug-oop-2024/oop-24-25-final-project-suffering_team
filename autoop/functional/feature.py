@@ -15,13 +15,13 @@ def detect_feature_types(dataset: Dataset) -> List[Feature]:
     data = dataset.read()
     columns = data.columns.tolist()
     for column in columns:
-        feature = Feature()
-        feature.name = column
+        name = column
         values = data[column]
         try:
             float(values[0])
-            feature.type = "numerical"
+            column_type = "numerical"
         except ValueError:
-            feature.type = "categorical"
+            column_type = "categorical"
+        feature = Feature(name, column_type)
         features.append(feature)
     return features
