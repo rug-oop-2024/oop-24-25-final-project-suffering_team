@@ -1,9 +1,11 @@
-
-from abc import abstractmethod, ABC
 from autoop.core.ml.artifact import Artifact
-import numpy as np
+
+from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Literal
+
+import numpy as np
+
 
 class Model(ABC):
     """Use as an abstract base class for different ML models."""

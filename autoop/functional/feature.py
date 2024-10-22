@@ -17,6 +17,7 @@ def detect_feature_types(dataset: Dataset) -> List[Feature]:
     for column in columns:
         name = column
         values = data[column]
+
         try:
             float(values[0])
             column_type = "numerical"
