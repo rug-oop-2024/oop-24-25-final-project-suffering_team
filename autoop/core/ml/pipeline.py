@@ -157,7 +157,15 @@ Pipeline(
         self._model.fit(observations, ground_truth)
 
     def _evaluate(self) -> None:
-        """Predict values using test data and collect the metric results."""
+        """Predict values for the data and collect the metric results."""
+        observations = self._compact_vectors(self._train_X)
+        ground_truth = self._train_y
+        self._train_metrics_results = []
+        predictions = self._model.predict(observations)
+        for metric in self._metrics:
+            result = metric.evaluate(predictions, ground_truth)
+            self._train_metrics_results.append((metric, result))
+
         observations = self._compact_vectors(self._test_X)
         ground_truth = self._test_y
         self._metrics_results = []
@@ -174,6 +182,7 @@ Pipeline(
         self._train()
         self._evaluate()
         return {
-            "metrics": self._metrics_results,
+            "train_metrics": self._train_metrics_results,
+            "test_metrics": self._metrics_results,
             "predictions": self._predictions,
         }

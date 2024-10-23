@@ -349,6 +349,3 @@ class Recall(Metric):
             return true_pos / (true_pos + false_neg)
 
         return 0.0
-
-
-asds = get_metric("asda")
