@@ -14,6 +14,7 @@ repos:
     rev: 23.12.1
     hooks:
       - id: black
+        args: ["--line-length", "80"] # Now hopefully the lines do not exceed 80
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
@@ -58,7 +59,7 @@ repos:
         args:
           [
             "--max-line-length",
-            "88",
+            "80",
             "--extend-ignore",
             "D100, SC200",
             "--max-cognitive-complexity",
