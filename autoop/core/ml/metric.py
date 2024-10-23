@@ -96,6 +96,7 @@ class MeanSquaredError(Metric):
             (float): The mean squared error of the model
         """
         self._check_dimensions(predictions, ground_truth)
+
         total_squared_error = np.sum((ground_truth - predictions) ** 2)
         return total_squared_error / len(predictions)
 
@@ -119,6 +120,7 @@ class MeanAbsoluteError(Metric):
             (float): The mean absolute error of the model.
         """
         self._check_dimensions(predictions, ground_truth)
+
         total_absolute_error = 0
         for index in range(len(predictions)):
             value = abs(ground_truth[index] - predictions[index])
@@ -147,6 +149,7 @@ class RSquared(Metric):
                 by the independent variables of the model between 0 and 1.
         """
         self._check_dimensions(predictions, ground_truth)
+
         sum_of_squares_regression = np.sum((ground_truth - predictions) ** 2)
         sum_of_squares_total = np.sum(
             (ground_truth - np.mean(ground_truth)) ** 2
@@ -174,8 +177,6 @@ class Accuracy(Metric):
             (float): The accuracy of the model between 0 and 1
         """
         self._check_dimensions(predictions, ground_truth)
-        if len(predictions) == 0:
-            return 0.0
 
         correct_predictions = np.sum(predictions == ground_truth)
         return correct_predictions / len(predictions)
@@ -189,6 +190,7 @@ class Precision(Metric):
     ) -> float:
         """Evaluate the model's precision.
 
+        Measures the accuracy of positive predictions for each label.
         Precision = True positive / (True positive + False positive)
 
         Args:
@@ -200,15 +202,13 @@ class Precision(Metric):
             (float): The precision of the model between 0 and 1
         """
         self._check_dimensions(predictions, ground_truth)
+
         unique_labels = np.unique(ground_truth)
         num_unique_labels = len(unique_labels)
 
-        if num_unique_labels == 0:
-            return 0.0
-
         total_precision = 0.0
 
-        for unique_label in np.unique(ground_truth):
+        for unique_label in unique_labels:
             total_precision += self._calculate_label_precision(
                 unique_label, predictions, ground_truth
             )
@@ -247,5 +247,74 @@ class Precision(Metric):
         # Avoid dividing by zero
         if true_pos + false_pos > 0:
             return true_pos / (true_pos + false_pos)
+
+        return 0.0
+
+
+class Recall(Metric):
+    """Create a metric Class for recall in classification."""
+
+    def evaluate(
+        self, predictions: np.ndarray, ground_truth: np.ndarray
+    ) -> float:
+        """Evaluate the model's recall ability.
+
+        Measures the classifier's ability to find all correct predictions for
+        each label. Recall = True positive / (True positive + False negative)
+
+        Args:
+            predictions (np.ndarray): An array of prediction labels
+            ground_truth (np.ndarray): An array with the ground_truth labels
+                (Must match number of predictions)
+
+        Returns:
+            (float): The recall of the model between 0 and 1
+        """
+        self._check_dimensions(predictions, ground_truth)
+
+        unique_labels = np.unique(ground_truth)
+        num_unique_labels = len(unique_labels)
+
+        total_recall = 0.0
+
+        for unique_label in unique_labels:
+            total_recall += self._calculate_label_recall(
+                unique_label, predictions, ground_truth
+            )
+
+        return total_recall / num_unique_labels
+
+    def _calculate_label_recall(
+        self,
+        unique_label: int | str,
+        predictions: np.ndarray,
+        ground_truth: np.ndarray,
+    ) -> float:
+        """Evaluate the model's recall of one label.
+
+        Recall = True positive / (True positive + False negative)
+
+        Args:
+            unique_label (int | str): The label for which the models recall
+                needs to be calculated.
+            predictions (np.ndarray): An array of prediction labels
+            ground_truth (np.ndarray): An array with the ground_truth labels
+                (Must match number of predictions)
+
+        Returns:
+            (float): The recall of the model between 0 and 1 of one label.
+        """
+        # Create boolean arrays that indicate matches for the unique label
+        # in both predictions and ground truth.
+        match_gt = ground_truth == unique_label
+        match_pred = predictions == unique_label
+
+        # Count the true positives and false negatives using the arrays.
+        true_pos = np.sum(match_gt & match_pred)
+        false_neg = np.sum(match_gt & ~match_pred)
+
+        # Avoid dividing by zero
+        if true_pos + false_neg > 0:
+            return true_pos / (true_pos + false_neg)
 
         return 0.0
