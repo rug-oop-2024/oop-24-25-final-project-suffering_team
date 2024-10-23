@@ -5,9 +5,11 @@ import numpy as np
 
 METRICS = [
     "mean_squared_error",
-    "accuracy",
     "mean_absolute_error",
     "r_squared",
+    "accuracy",
+    "precision",
+    "recall",
 ]  # add the names (in strings) of the metrics you implement
 
 
