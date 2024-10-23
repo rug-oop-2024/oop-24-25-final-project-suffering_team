@@ -175,7 +175,7 @@ Pipeline(
             self._metrics_results.append((metric, result))
         self._predictions = predictions
 
-    def execute(self) -> None:
+    def execute(self) -> dict[str, List]:
         """Process the data in the model and collect the results."""
         self._preprocess_features()
         self._split_data()
