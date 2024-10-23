@@ -94,7 +94,7 @@ class Metric(ABC):
         Raises:
             ValueError: If the number of predictions does not equal the number
                 of ground truth labels.
-            ValueError: If there are not predictions or ground_truths.
+            ValueError: If there are no predictions or ground_truths.
         """
         if len(predictions) != len(ground_truth):
             raise ValueError(
