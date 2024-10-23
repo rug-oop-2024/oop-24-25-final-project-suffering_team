@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Any
 
 import numpy as np
 
@@ -10,36 +9,61 @@ METRICS = [
     "accuracy",
     "precision",
     "recall",
-]  # add the names (in strings) of the metrics you implement
+]
 
 
-def get_metric(name: str) -> Any:
-    """Create metric using given name.
+def get_metric(name: str) -> "Metric":
+    """Return a metric instance corresponding to the provided name.
 
     Args:
-        name (str): name of metric
+        name (str): The name of the asked metric.
 
     Returns:
-        Any: instance of metric of given name
+        Metric: An instance of the specified metric.
+
+    Raises:
+        ValueError: If the metric name is not valid.
     """
-    # Factory function to get a metric by name.
-    # Return a metric instance given its str name.
     if name not in METRICS:
-        return None
+        raise ValueError(
+            f"'{name}' is not a valid metric name. Use one of the following:\n"
+            + "\n".join(METRICS)
+        )
+
     match name:
         case "mean_squared_error":
             return MeanSquaredError()
+        case "mean_absolute_error":
+            return MeanAbsoluteError()
+        case "r_squared":
+            return RSquared()
         case "accuracy":
             return Accuracy()
-    return None
+        case "precision":
+            return Precision()
+        case "recall":
+            return Recall()
+
+    raise ValueError(f"No metric found for the name: '{name}'.")
 
 
 class Metric(ABC):
     """Base class for all metrics."""
 
-    def __call__(self):
-        """Call get metric function to get the correct metric instance."""
-        print("what the fuck are ou doing.")
+    def __call__(
+        self, predictions: np.ndarray, ground_truth: np.ndarray
+    ) -> float:
+        """Evaluate predictions with the class-defined metric.
+
+        Args:
+            predictions (np.ndarray): An array of predictions.
+            ground_truth (np.ndarray): An array with the ground_truth
+                (Must match number of predictions.)
+
+        Returns:
+            float: The value of the evaluated metric.
+        """
+        return self.evaluate(predictions, ground_truth)
 
     @abstractmethod
     def evaluate(
@@ -53,7 +77,7 @@ class Metric(ABC):
                 (Must match number of predictions.)
 
         Returns:
-            (float): The value of the evaluated metric.
+            float: The value of the evaluated metric.
         """
         pass
 
@@ -66,6 +90,11 @@ class Metric(ABC):
             predictions (np.ndarray): an array of predictions
             ground_truth (np.ndarray): an array with the ground_truth
                 (Must match number of predictions.)
+
+        Raises:
+            ValueError: If the number of predictions does not equal the number
+                of ground truth labels.
+            ValueError: If there are not predictions or ground_truths.
         """
         if len(predictions) != len(ground_truth):
             raise ValueError(
@@ -95,7 +124,7 @@ class MeanSquaredError(Metric):
                 (Must match number of predictions)
 
         Returns:
-            (float): The mean squared error of the model
+            float: The mean squared error of the model
         """
         self._check_dimensions(predictions, ground_truth)
 
@@ -119,7 +148,7 @@ class MeanAbsoluteError(Metric):
                 (Must match number of predictions)
 
         Returns:
-            (float): The mean absolute error of the model.
+            float: The mean absolute error of the model.
         """
         self._check_dimensions(predictions, ground_truth)
 
@@ -147,7 +176,7 @@ class RSquared(Metric):
                 (Must match number of predictions)
 
         Returns:
-            (float): The proportion of variance that can be explained
+            float: The proportion of variance that can be explained
                 by the independent variables of the model between 0 and 1.
         """
         self._check_dimensions(predictions, ground_truth)
@@ -176,7 +205,7 @@ class Accuracy(Metric):
                 (Must match number of predictions)
 
         Returns:
-            (float): The accuracy of the model between 0 and 1
+            float: The accuracy of the model between 0 and 1
         """
         self._check_dimensions(predictions, ground_truth)
 
@@ -201,7 +230,7 @@ class Precision(Metric):
                 (Must match number of predictions)
 
         Returns:
-            (float): The precision of the model between 0 and 1
+            float: The precision of the model between 0 and 1
         """
         self._check_dimensions(predictions, ground_truth)
 
@@ -235,7 +264,7 @@ class Precision(Metric):
                 (Must match number of predictions)
 
         Returns:
-            (float): The precision of the model between 0 and 1 of one label.
+            float: The precision of the model between 0 and 1 of one label.
         """
         # Create boolean arrays that indicate matches for the unique label
         # in both predictions and ground truth.
@@ -270,7 +299,7 @@ class Recall(Metric):
                 (Must match number of predictions)
 
         Returns:
-            (float): The recall of the model between 0 and 1
+            float: The recall of the model between 0 and 1
         """
         self._check_dimensions(predictions, ground_truth)
 
@@ -304,7 +333,7 @@ class Recall(Metric):
                 (Must match number of predictions)
 
         Returns:
-            (float): The recall of the model between 0 and 1 of one label.
+            float: The recall of the model between 0 and 1 of one label.
         """
         # Create boolean arrays that indicate matches for the unique label
         # in both predictions and ground truth.
@@ -320,3 +349,6 @@ class Recall(Metric):
             return true_pos / (true_pos + false_neg)
 
         return 0.0
+
+
+asds = get_metric("asda")
