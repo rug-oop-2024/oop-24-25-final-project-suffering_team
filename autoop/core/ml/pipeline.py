@@ -175,8 +175,13 @@ Pipeline(
             self._metrics_results.append((metric, result))
         self._predictions = predictions
 
-    def execute(self) -> dict[str, List]:
-        """Process the data in the model and collect the results."""
+    def execute(self) -> dict[str, list]:
+        """Process the data in the model and collect the results.
+
+        Returns:
+            dict[str, list]: A dictionary containing the training and test
+                metrics and the predictions.
+        """
         self._preprocess_features()
         self._split_data()
         self._train()
