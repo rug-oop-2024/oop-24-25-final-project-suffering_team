@@ -55,6 +55,26 @@ class Metric(ABC):
         """
         pass
 
+    def _check_dimensions(
+        self, predictions: np.ndarray, ground_truth: np.ndarray
+    ) -> None:
+        """Check if the predictions and ground_truth have the right dimensions.
+
+        Args:
+            predictions (np.ndarray): an array of predictions
+            ground_truth (np.ndarray): an array with the ground_truth
+                (Must match number of predictions.)
+        """
+        if len(predictions) != len(ground_truth):
+            raise ValueError(
+                "The number of predictions must equal the number "
+                "of ground truth labels."
+            )
+        if len(predictions) == 0:
+            raise ValueError(
+                "Predictions and ground truth arrays cannot be empty."
+            )
+
 
 # add here concrete implementations of the Metric class
 class MeanSquaredError(Metric):
@@ -75,6 +95,7 @@ class MeanSquaredError(Metric):
         Returns:
             (float): The mean squared error of the model
         """
+        self._check_dimensions(predictions, ground_truth)
         total_squared_error = np.sum((ground_truth - predictions) ** 2)
         return total_squared_error / len(predictions)
 
@@ -97,6 +118,7 @@ class MeanAbsoluteError(Metric):
         Returns:
             (float): The mean absolute error of the model.
         """
+        self._check_dimensions(predictions, ground_truth)
         total_absolute_error = 0
         for index in range(len(predictions)):
             value = abs(ground_truth[index] - predictions[index])
@@ -124,6 +146,7 @@ class RSquared(Metric):
             (float): The proportion of variance that can be explained
                 by the independent variables of the model between 0 and 1.
         """
+        self._check_dimensions(predictions, ground_truth)
         sum_of_squares_regression = np.sum((ground_truth - predictions) ** 2)
         sum_of_squares_total = np.sum(
             (ground_truth - np.mean(ground_truth)) ** 2
@@ -150,6 +173,7 @@ class Accuracy(Metric):
         Returns:
             (float): The accuracy of the model between 0 and 1
         """
+        self._check_dimensions(predictions, ground_truth)
         if len(predictions) == 0:
             return 0.0
 
@@ -175,6 +199,7 @@ class Precision(Metric):
         Returns:
             (float): The precision of the model between 0 and 1
         """
+        self._check_dimensions(predictions, ground_truth)
         unique_labels = np.unique(ground_truth)
         num_unique_labels = len(unique_labels)
 
