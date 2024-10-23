@@ -23,7 +23,24 @@ class Pipeline:
         target_feature: Feature,
         split=0.8,
     ):
-        """Initialize the pipeline."""
+        """Initialize the pipeline.
+
+        Args:
+            metrics (List[Metric]): The list of metrics to be used.
+            dataset (Dataset): The data used for processing.
+            model (Model): The model used to process the data.
+            input_features (List[Feature]): A list of features stating
+                their name and whether they are numerical or categorical.
+            target_feature (Feature): The feature to make predictions for.
+            split (float, optional): The distribution of the train and testing data.
+                Defaults to 0.8.
+
+        Raises:
+            ValueError: If a classification model is used on a continuous
+                target feature.
+            ValueError: If a regression model is used on a catagorical target
+                feature.
+        """
         self._dataset = dataset
         self._model = model
         self._input_features = input_features
