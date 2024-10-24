@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Literal, Any
+from typing import Any, Literal
 
 import numpy as np
 
