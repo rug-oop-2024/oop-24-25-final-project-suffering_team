@@ -27,20 +27,17 @@ class MultipleLinearRegression(Model):
                 At least two observations are needed for regression.
         """
         # Add a column of ones for the intercept
-        n_rows = observations.shape[0]
-        column_of_ones = np.ones((n_rows, 1))
-        np.append(observations, column_of_ones, axis=1)
-        # Check if there rows are even
-        observation_rows = observations.shape[0]
-        ground_truth_rows = ground_truths.shape[0]
-        if observation_rows != ground_truth_rows:
+        observations = np.hstack(
+            [observations, np.ones((observations.shape[0], 1))]
+        )
+
+        # Verify the shape of the input
+        if observations.shape[0] != ground_truths.shape[0]:
             raise ValueError(
                 "The number of observations and ground_truths should be"
                 "the equal."
             )
-
-        # Check if there are at least two observations
-        if observation_rows <= 1:
+        if observations.shape[0] <= 1:
             raise ValueError("At least two observations are needed.")
 
         # Calculate the parameters using z_star = (X^T * X)^-1 * X^T * y
@@ -74,13 +71,13 @@ class MultipleLinearRegression(Model):
                 The predictions for the given observations.
         """
         # Add a column of ones for the intercept
-        n_rows = observations.shape[0]
-        column_of_ones = np.ones((n_rows, 1))
-        np.append(observations, column_of_ones, axis=1)
+        observations = np.hstack(
+            [observations, np.ones((observations.shape[0], 1))]
+        )
 
         # Check for and store the parameters
         params = self.parameters
-        if "parameters" not in params.keys():
+        if "parameters" not in self.parameters:
             raise ValueError(
                 "Model not fitted. Call 'fit' with appropriate arguments"
                 "before using 'predict'"

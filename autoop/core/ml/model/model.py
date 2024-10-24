@@ -1,17 +1,17 @@
-from autoop.core.ml.artifact import Artifact
-
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Literal
 
 import numpy as np
 
+from autoop.core.ml.artifact import Artifact
+
 
 class Model(ABC):
     """Use as an abstract base class for different ML models."""
 
     def __init__(self):
-        self._prameters = {}
+        self._parameters = {}
 
     @property
     def parameters(self) -> dict[str, np.ndarray]:
@@ -31,29 +31,38 @@ class Model(ABC):
 
         Args:
             value (dict[str, np.ndarray]):
-                A dictionary that replaces the parameter dictionary.
+                A dictionary that updates the parameter dictionary.
 
         Raises:
             ValueError:
-                Can only replace the dictionary with a dictionary.
-            ValueError:
-                The keys in the dictionary must be strings.
-            ValueError:
-                The values in the dictionary must be np.ndarrays.
+                If the new input is not a dictionary.
         """
         if not isinstance(new_parameters, dict):
             raise TypeError("Parameters must be a dictionary.")
 
         # Check if the dictionary has the correct key and value types
-        for key in new_parameters:
-            if not isinstance(key, str):
-                raise TypeError("Keys for the new_parameters must be strings.")
-            if not isinstance(new_parameters[key], np.ndarray):
-                raise TypeError(
-                    "The values for new_parameters must be np.ndarrays."
-                )
+        for key, value in new_parameters.items:
+            self._validate_key_value(key, value)
 
-        self._parameters = new_parameters
+        self._parameters.update(new_parameters)
+
+    def _validate_key_value(self, key: str, value: np.ndarray) -> None:
+        """Validate individual key-value pairs for the parameters dictionary.
+
+        Args:
+            key (str):
+                The parameter name, which must be a string.
+            value (np.ndarray):
+                The parameter value, which must be a numpy ndarray.
+
+        Raises:
+            TypeError:
+                If the key is not a string or the value is not a numpy ndarray.
+        """
+        if not isinstance(key, str):
+            raise TypeError("Keys for the parameters must be strings.")
+        if not isinstance(value, np.ndarray):
+            raise TypeError("Values for parameters must be np.ndarrays.")
 
     @abstractmethod
     def fit(self, observations: np.ndarray, ground_truths: np.ndarray) -> None:
