@@ -36,9 +36,17 @@ class Artifact(BaseModel):
         self.metadata = metadata if metadata is not None else {}
 
     def read(self) -> bytes:
-        """Retrieve the data from the artifact."""
+        """Retrieve the data from the artifact.
+
+        Returns:
+            bytes: The bytes that represent the data of the artifact.
+        """
         return self.data
 
     def save(self, new_data) -> None:
-        """Save the data in the artifact."""
+        """Save the data in the artifact.
+
+        Args:
+            new_data (_type_): The data that is to be saved in the artifact.
+        """
         self.data = new_data
