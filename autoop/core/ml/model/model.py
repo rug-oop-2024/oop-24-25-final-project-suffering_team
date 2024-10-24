@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Literal
+from typing import Literal, Any
 
 import numpy as np
 
@@ -26,11 +26,11 @@ class Model(ABC):
         return deepcopy(self._parameters)
 
     @parameters.setter
-    def parameters(self, new_parameters: dict[str, np.ndarray]) -> None:
+    def parameters(self, new_parameters: dict[str, Any]) -> None:
         """Use the setter to validate and update the model parameters.
 
         Args:
-            value (dict[str, np.ndarray]):
+            new_parameters (dict[str, np.ndarray]):
                 A dictionary that updates the parameter dictionary.
 
         Raises:
@@ -41,28 +41,24 @@ class Model(ABC):
             raise TypeError("Parameters must be a dictionary.")
 
         # Check if the dictionary has the correct key and value types
-        for key, value in new_parameters.items:
-            self._validate_key_value(key, value)
+        for key in new_parameters.keys():
+            self._validate_key(key)
 
         self._parameters.update(new_parameters)
 
-    def _validate_key_value(self, key: str, value: np.ndarray) -> None:
-        """Validate individual key-value pairs for the parameters dictionary.
+    def _validate_key(self, key: str, value: np.ndarray) -> None:
+        """Validate individual keys for the parameters dictionary.
 
         Args:
             key (str):
                 The parameter name, which must be a string.
-            value (np.ndarray):
-                The parameter value, which must be a numpy ndarray.
 
         Raises:
             TypeError:
-                If the key is not a string or the value is not a numpy ndarray.
+                If the key is not a string.
         """
         if not isinstance(key, str):
             raise TypeError("Keys for the parameters must be strings.")
-        if not isinstance(value, np.ndarray):
-            raise TypeError("Values for parameters must be np.ndarrays.")
 
     @abstractmethod
     def fit(self, observations: np.ndarray, ground_truths: np.ndarray) -> None:
