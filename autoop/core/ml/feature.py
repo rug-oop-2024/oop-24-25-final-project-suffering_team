@@ -1,12 +1,11 @@
 from typing import Literal
 
 import numpy as np
-from pydantic import BaseModel, Field
 
 from autoop.core.ml.dataset import Dataset
 
 
-class Feature(BaseModel):
+class Feature:
     """Represent a categorical or numerical column in a csv."""
 
     def __init__(self, name: str, column_type: str):

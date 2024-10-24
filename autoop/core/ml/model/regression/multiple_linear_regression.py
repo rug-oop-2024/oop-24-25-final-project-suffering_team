@@ -1,5 +1,6 @@
 import numpy as np
-from model.model import Model
+
+from autoop.core.ml.model.model import Model
 
 
 class MultipleLinearRegression(Model):
@@ -34,7 +35,8 @@ class MultipleLinearRegression(Model):
         ground_truth_rows = ground_truths.shape[0]
         if observation_rows != ground_truth_rows:
             raise ValueError(
-                "The number of observations and ground_truths should be" "the equal."
+                "The number of observations and ground_truths should be"
+                "the equal."
             )
 
         # Check if there are at least two observations

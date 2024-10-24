@@ -1,5 +1,4 @@
 import io
-from abc import ABC, abstractmethod
 
 import pandas as pd
 
@@ -11,7 +10,7 @@ class Dataset(Artifact):
 
     def __init__(self, *args, **kwargs):
         """Initialize the dataset."""
-        super().__init__(type="dataset", *args, **kwargs)
+        super().__init__(artifact_type="dataset", *args, **kwargs)
 
     @staticmethod
     def from_dataframe(
@@ -41,8 +40,8 @@ class Dataset(Artifact):
         Returns:
             pd.DataFrame: The data frame restored from the bytes.
         """
-        bytes = super().read()
-        csv = bytes.decode()
+        data_bytes = super().read()
+        csv = data_bytes.decode()
         return pd.read_csv(io.StringIO(csv))
 
     def save(self, data: pd.DataFrame) -> bytes:
@@ -54,5 +53,5 @@ class Dataset(Artifact):
         Returns:
             bytes: The bytes representing the dataframe.
         """
-        bytes = data.to_csv(index=False).encode()
-        return super().save(bytes)
+        data_bytes = data.to_csv(index=False).encode()
+        return super().save(data_bytes)

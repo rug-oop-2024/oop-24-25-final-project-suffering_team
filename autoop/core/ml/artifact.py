@@ -1,9 +1,7 @@
 import base64
 
-from pydantic import BaseModel, Field
 
-
-class Artifact(BaseModel):
+class Artifact:
     """Make artifact class."""
 
     def __init__(
