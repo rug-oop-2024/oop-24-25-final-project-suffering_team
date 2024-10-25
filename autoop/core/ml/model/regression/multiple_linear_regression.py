@@ -77,7 +77,7 @@ class MultipleLinearRegression(Model):
 
         # Check for and store the parameters
         params = self.parameters
-        if "parameters" not in self.parameters:
+        if "parameters" not in params:
             raise ValueError(
                 "Model not fitted. Call 'fit' with appropriate arguments"
                 "before using 'predict'"

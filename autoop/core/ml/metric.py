@@ -181,11 +181,14 @@ class RSquared(Metric):
         """
         self._check_dimensions(predictions, ground_truth)
 
-        sum_of_squares_regression = np.sum((ground_truth - predictions) ** 2)
+        residual_sum_of_squares = np.sum((ground_truth - predictions) ** 2)
         sum_of_squares_total = np.sum(
             (ground_truth - np.mean(ground_truth)) ** 2
         )
-        return 1 - sum_of_squares_regression / sum_of_squares_total
+        if sum_of_squares_total == 0:
+            return float("nan")
+
+        return 1 - residual_sum_of_squares / sum_of_squares_total
 
 
 class Accuracy(Metric):

@@ -5,7 +5,7 @@ from autoop.core.ml.model.model import Model
 
 
 class Lasso(Model):
-    """An Lasso implementation of the Model class."""
+    """A Lasso implementation of the Model class."""
 
     def __init__(self, *args, **kwargs):
         """Initialize the lasso model with the provided parameters.
