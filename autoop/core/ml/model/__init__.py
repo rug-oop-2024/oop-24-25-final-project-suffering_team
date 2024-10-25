@@ -1,4 +1,6 @@
-from autoop.core.ml.model.classification.k_nearest_neighbors import KNearestNeighbors
+from autoop.core.ml.model.classification.k_nearest_neighbors import (
+    KNearestNeighbors
+)
 from autoop.core.ml.model.model import Model
 from autoop.core.ml.model.regression.lasso import Lasso
 from autoop.core.ml.model.regression.multiple_linear_regression import (

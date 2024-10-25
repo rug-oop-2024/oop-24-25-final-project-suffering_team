@@ -19,7 +19,7 @@ class Artifact:
         Args:
             name (str): name of artifact
             asset_path (str): path of artifact
-            type (str): artifact type
+            artifact_type (str): artifact type
             data (bytes): data of artifact
             version (str): artifact version
             tags (list, optional): tags for artifact. Defaults to [].
@@ -32,6 +32,15 @@ class Artifact:
         self.version = version
         self.tags = tags if tags is not None else []
         self.metadata = metadata if metadata is not None else {}
+
+    def save_metadata(self, name: str):
+        """Save new metadata.
+
+        Args:
+            name (str): name of metadata
+        """
+        data_id = f"{base64(self.asset_path)}-{self.version}"
+        self.metadata.update({name: data_id})
 
     def read(self) -> bytes:
         """Retrieve the data from the artifact.
