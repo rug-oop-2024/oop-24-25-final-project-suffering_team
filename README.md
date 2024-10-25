@@ -155,16 +155,16 @@ If you did not implement the feature
 |-------------------------------------- |--------------|----------------------|--------------------------|---------|
 | Up-to-date requirements.txt           | NF           |                      |         | |
 | `ML/detect-features`                  | FN           |   Richard            |    X    | |
-| `ML/artifact`                         | NF           |                      |         | |
-| `ML/feature`                          | NF           |                      |         | |
-| `ML/metric`                           | NF           |                      |         | |
-| `ML/metric/extensions`                | FN           |                      |         | |
-| `ML/model`                            | NF           |                      |         | |
+| `ML/artifact`                         | NF           |   both               |    X    | |
+| `ML/feature`                          | NF           |   both               |    X    | |
+| `ML/metric`                           | NF           |   both               |    X    | |
+| `ML/metric/extensions`                | FN           |   both               |    X    | |
+| `ML/model`                            | NF           |   both               |    X    | |
 | `ML/model/extensions`                 | FN           |                      |         | |
 | `ML/pipeline/evaluation`              | FN           |                      |         | |
-| `ST/page/datasets`                    | NF           |                      |         | |
-| `ST/datasets/management/create`       | FN           |                      |         | |
-| `ST/datasets/management/save`         | FN           |                      |         | |
+| `ST/page/datasets`                    | NF           |   Richard            |    X    | |
+| `ST/datasets/management/create`       | FN           |   Richard            |    X    | |
+| `ST/datasets/management/save`         | FN           |   Richard            |    X    | |
 | `ST/page/modelling`                   | NF           |                      |         | |
 | `ST/modelling/datasets/list`          | FN           |                      |         | |
 | `ST/modelling/datasets/features`      | FN           |                      |         | |
