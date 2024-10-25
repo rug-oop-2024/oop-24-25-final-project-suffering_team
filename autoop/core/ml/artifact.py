@@ -32,6 +32,7 @@ class Artifact:
         self.version = version
         self.tags = tags if tags is not None else []
         self.metadata = metadata if metadata is not None else {}
+        self.id = f"{self._base64_encode(self.asset_path)}-{self.version}"
 
     def save_metadata(self, name: str):
         """Save new metadata.
@@ -39,8 +40,19 @@ class Artifact:
         Args:
             name (str): name of metadata
         """
-        data_id = f"{base64(self.asset_path)}-{self.version}"
-        self.metadata.update({name: data_id})
+        self.metadata.update({name: self.id})
+
+    @staticmethod
+    def _base64_encode(value: str) -> str:
+        """Encode a string using base64 for unique asset ID generation.
+
+        Args:
+            value (str): The value to encode.
+
+        Returns:
+            str: Base64 encoded string.
+        """
+        return base64.urlsafe_b64encode(value.encode()).decode()
 
     def read(self) -> bytes:
         """Retrieve the data from the artifact.
@@ -55,5 +67,9 @@ class Artifact:
 
         Args:
             new_data (_type_): The data that is to be saved in the artifact.
+
+        Returns:
+            returns the data that was given.
         """
         self.data = new_data
+        return self.data
