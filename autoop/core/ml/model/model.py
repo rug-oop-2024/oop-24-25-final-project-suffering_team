@@ -1,16 +1,15 @@
 from abc import ABC, abstractmethod
 from copy import deepcopy
-from typing import Any, Literal
+from typing import Any
 
 import numpy as np
-
-from autoop.core.ml.artifact import Artifact
 
 
 class Model(ABC):
     """Use as an abstract base class for different ML models."""
 
     def __init__(self):
+        """Initialize model base class."""
         self._parameters = {}
 
     @property
@@ -46,7 +45,7 @@ class Model(ABC):
 
         self._parameters.update(new_parameters)
 
-    def _validate_key(self, key: str, value: np.ndarray) -> None:
+    def _validate_key(self, key: str) -> None:
         """Validate individual keys for the parameters dictionary.
 
         Args:

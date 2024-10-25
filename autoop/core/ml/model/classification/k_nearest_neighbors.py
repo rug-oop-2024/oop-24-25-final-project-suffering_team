@@ -1,9 +1,9 @@
-from model.model import Model
-
 from collections import Counter
 
 import numpy as np
 from pydantic import BaseModel, Field, field_validator
+
+from autoop.core.ml.model.model import Model
 
 
 class KNearestNeighbors(Model, BaseModel):
@@ -12,6 +12,7 @@ class KNearestNeighbors(Model, BaseModel):
     k: int = Field(default=3)
 
     def __init__(self):
+        """Initialize model."""
         super.__init__()
 
     @field_validator("k")
@@ -58,9 +59,13 @@ class KNearestNeighbors(Model, BaseModel):
         ground_truth_rows = ground_truth.shape[0]
         if observation_rows != ground_truth_rows:
             raise ValueError(
-                "The number of observations and ground_truths " "should be the equal."
+                "The number of observations and ground_truths "
+                "should be the equal."
             )
-        self.parameters = {"observations": observations, "ground_truth": ground_truth}
+        self.parameters = {
+            "observations": observations,
+            "ground_truth": ground_truth,
+        }
 
     def predict(self, observations: np.ndarray) -> np.ndarray:
         """Predict for each observation how it should be classified.
