@@ -17,10 +17,7 @@ class Lasso(Model):
         super().__init__()
         self._model = SkLasso(*args, **kwargs)
         # Add hyper parameters to the parameters dictionary using the setter.
-        new_parameters = {
-            param_name: np.array([param_value])
-            for param_name, param_value in kwargs.items()
-        }
+        new_parameters = self._model.get_params()
         self.parameters = new_parameters
         self.type = "regression"
 
@@ -54,7 +51,7 @@ class Lasso(Model):
         # Add the coefficients and intercept to parameters using the setter.
         self.parameters = {
             "coefficients": np.array(self._model.coef_),
-            "intercept": np.array([self._model.intercept_]),
+            "intercept": np.atleast_1d(self._model.intercept_),
         }
 
     def predict(self, observations: np.ndarray) -> np.ndarray:
