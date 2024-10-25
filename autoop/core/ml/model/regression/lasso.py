@@ -22,6 +22,7 @@ class Lasso(Model):
             for param_name, param_value in kwargs.items()
         }
         self.parameters = new_parameters
+        self.type = "regression"
 
     def fit(self, observations: np.ndarray, ground_truths: np.ndarray) -> None:
         """Use the observations and ground_truths to train the Lasso model.
@@ -50,12 +51,11 @@ class Lasso(Model):
         # Train the model
         self._model.fit(observations, ground_truths)
 
-        # Add the coefficients to parameters using the setter.
-        self.parameters = {"coefficients": np.array(self._model.coef_)}
-
-        # Add the intercept to parameters if it exists.
-        if self._model.fit_intercept:
-            self.parameters = {"intercept": np.array([self._model.intercept_])}
+        # Add the coefficients and intercept to parameters using the setter.
+        self.parameters = {
+            "coefficients": np.array(self._model.coef_),
+            "intercept": np.array([self._model.intercept_]),
+        }
 
     def predict(self, observations: np.ndarray) -> np.ndarray:
         """Use the model to predict values for observations.

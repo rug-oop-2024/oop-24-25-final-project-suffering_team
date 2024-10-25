@@ -18,7 +18,9 @@ class TestPipeline(unittest.TestCase):
 
     def setUp(self) -> None:
         """Create setup pipeline to test."""
-        data = fetch_openml(name="cloud", version=1, parser="auto")
+        data = fetch_openml(
+            name="cloud", version=1, parser="auto", target_column=None
+        )
         df = pd.DataFrame(
             data.data,
             columns=data.feature_names,
@@ -33,9 +35,9 @@ class TestPipeline(unittest.TestCase):
             dataset=self.dataset,
             model=MultipleLinearRegression(),
             input_features=list(
-                filter(lambda x: x.name != "NC", self.features)
+                filter(lambda x: x.name != "TE", self.features)
             ),
-            target_feature=Feature(name="NC", column_type="numerical"),
+            target_feature=Feature(name="TE", column_type="numerical"),
             metrics=[MeanSquaredError()],
             split=0.8,
         )

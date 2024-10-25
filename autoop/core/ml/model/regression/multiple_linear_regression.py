@@ -6,6 +6,11 @@ from autoop.core.ml.model.model import Model
 class MultipleLinearRegression(Model):
     """A MultipleLinearRegression implementation of the model class."""
 
+    def __init__(self):
+        """Initialize the MultipleLinearRegression model."""
+        super().__init__()
+        self.type = "regression"
+
     def fit(self, observations: np.ndarray, ground_truths: np.ndarray) -> None:
         """Train the model using observations and ground_truths.
 
