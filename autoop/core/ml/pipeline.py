@@ -1,7 +1,6 @@
 import pickle
-from typing import List
 
-import numpy as np
+from typing import List
 
 from autoop.core.ml.artifact import Artifact
 from autoop.core.ml.dataset import Dataset
@@ -9,6 +8,8 @@ from autoop.core.ml.feature import Feature
 from autoop.core.ml.metric import Metric
 from autoop.core.ml.model import Model
 from autoop.functional.preprocessing import preprocess_features
+
+import numpy as np
 
 
 class Pipeline:
@@ -32,7 +33,7 @@ class Pipeline:
             input_features (List[Feature]): A list of features stating
                 their name and whether they are numerical or categorical.
             target_feature (Feature): The feature to make predictions for.
-            split (float, optional): The distribution of the train and testing data.
+            split (float, optional): The split of the train and testing data.
                 Defaults to 0.8.
 
         Raises:
@@ -53,7 +54,8 @@ class Pipeline:
             and model.type != "classification"
         ):
             raise ValueError(
-                "Model type must be classification for categorical target feature"
+                "Model type must be classification",
+                "for categorical target feature",
             )
         if target_feature.type == "continuous" and model.type != "regression":
             raise ValueError(
@@ -64,10 +66,10 @@ class Pipeline:
         """Return a string representation of the most important attributes."""
         return f"""
 Pipeline(
-    model={self._model.type},
-    input_features={list(map(str, self._input_features))},
-    target_feature={str(self._target_feature)},
-    split={self._split},
+    model={self._model.type},\n
+    input_features={list(map(str, self._input_features))},\n
+    target_feature={str(self._target_feature)},\n
+    split={self._split},\n
     metrics={list(map(str, self._metrics))},
 )
 """
@@ -120,7 +122,9 @@ Pipeline(
             [self._target_feature], self._dataset
         )[0]
         self._register_artifact(target_feature_name, artifact)
-        input_results = preprocess_features(self._input_features, self._dataset)
+        input_results = preprocess_features(
+            self._input_features, self._dataset
+        )
         for feature_name, data, artifact in input_results:
             self._register_artifact(feature_name, artifact)
         # Get the input vectors and output vector,
@@ -134,10 +138,12 @@ Pipeline(
         """Split the data into training and testing sets."""
         split = self._split
         self._train_X = [
-            vector[: int(split * len(vector))] for vector in self._input_vectors
+            vector[: int(split * len(vector))]
+            for vector in self._input_vectors
         ]
         self._test_X = [
-            vector[int(split * len(vector)) :] for vector in self._input_vectors
+            vector[int(split * len(vector)) :]
+            for vector in self._input_vectors
         ]
         self._train_y = self._output_vector[
             : int(split * len(self._output_vector))

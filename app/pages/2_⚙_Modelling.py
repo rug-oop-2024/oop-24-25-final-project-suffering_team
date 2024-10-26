@@ -1,22 +1,22 @@
 import io
 
-import pandas as pd
-import streamlit as st
-
 from app.core.system import AutoMLSystem
 from autoop.core.ml.dataset import Dataset
 from autoop.core.ml.metric import (
     CLASSIFICATION_METRICS,
     REGRESSION_METRICS,
-    get_metric
+    get_metric,
 )
 from autoop.core.ml.model import (
     CLASSIFICATION_MODELS,
     REGRESSION_MODELS,
-    get_model
+    get_model,
 )
 from autoop.core.ml.pipeline import Pipeline
 from autoop.functional.feature import detect_feature_types
+
+import pandas as pd
+import streamlit as st
 
 st.set_page_config(page_title="Modelling", page_icon="📈")
 
@@ -32,7 +32,7 @@ def write_helper_text(text: str):
 
 st.write("# ⚙ Modelling")
 write_helper_text(
-    "In this section, you can design a " 
+    "In this section, you can design a "
     + "machine learning pipeline to train a model on a dataset."
 )
 
@@ -88,9 +88,7 @@ if name is not None:
 
         if feature_type == "numerical":
             st.write("Task type is regression.")
-            model = st.selectbox(
-                "Choose models to use:", REGRESSION_MODELS, None
-            )
+            model = st.selectbox("Choose models to use:", REGRESSION_MODELS)
             model = get_model(model)
             if model is not None:
                 selected_model = True
@@ -104,7 +102,7 @@ if name is not None:
         elif feature_type == "categorical":
             st.write("Task type is classification.")
             model = st.selectbox(
-                "Choose models to use:", CLASSIFICATION_MODELS, None
+                "Choose models to use:", CLASSIFICATION_MODELS
             )
             model = get_model(model)
             if model is not None:
