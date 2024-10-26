@@ -13,7 +13,7 @@ class KNearestNeighbors(Model, BaseModel):
 
     def __init__(self):
         """Initialize model."""
-        super.__init__()
+        super().__init__()
 
     @field_validator("k")
     def k_greater_than_zero(cls, value: int) -> int:

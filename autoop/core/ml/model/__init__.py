@@ -14,9 +14,20 @@ REGRESSION_MODELS = [
     "Ridge",
 ]  # add your models as str here
 
-CLASSIFICATION_MODELS = ["KNearestNeighbors"]  # add your models as str here
+CLASSIFICATION_MODELS = [
+    "KNearestNeighbors"
+]  # add your models as str here
 
 
 def get_model(model_name: str) -> Model:
     """Get a model by name using this Factory Function."""
-    raise NotImplementedError("To be implemented.")
+    match model_name:
+        case "MultipleLinearRegression":
+            return MultipleLinearRegression()
+        case "Lasso":
+            return Lasso()
+        case "Ridge":
+            return Ridge()
+        case "KNearestNeighbors":
+            return KNearestNeighbors()
+    raise ValueError("model doesn't exist.")

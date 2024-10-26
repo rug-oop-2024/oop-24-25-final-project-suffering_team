@@ -1,10 +1,3 @@
-from typing import Literal
-
-import numpy as np
-
-from autoop.core.ml.dataset import Dataset
-
-
 class Feature:
     """Represent a categorical or numerical column in a csv."""
 
@@ -25,7 +18,4 @@ class Feature:
             str: The string representation of the name and variables of the
                 feature.
         """
-        return (
-            f"Column to predict is {self.name}, which contains {self.type}",
-            "variables.",
-        )
+        return f"Column is {self.name}, which contains {self.type} variables."

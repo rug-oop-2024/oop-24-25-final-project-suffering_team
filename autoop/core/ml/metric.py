@@ -2,14 +2,13 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-METRICS = [
+REGRESSION_METRICS = [
     "mean_squared_error",
     "mean_absolute_error",
     "r_squared",
-    "accuracy",
-    "precision",
-    "recall",
 ]
+
+CLASSIFICATION_METRICS = ["accuracy", "precision", "recall"]
 
 
 def get_metric(name: str) -> "Metric":
@@ -24,10 +23,12 @@ def get_metric(name: str) -> "Metric":
     Raises:
         ValueError: If the metric name is not valid.
     """
-    if name not in METRICS:
+    all_metrics = REGRESSION_METRICS + CLASSIFICATION_METRICS
+    if name not in all_metrics:
         raise ValueError(
             f"'{name}' is not a valid metric name. Use one of the following:\n"
-            + "\n".join(METRICS)
+            + "\n".join(REGRESSION_METRICS)
+            + "\n".join(CLASSIFICATION_METRICS)
         )
 
     match name:

@@ -8,6 +8,9 @@ automl = AutoMLSystem.get_instance()
 
 datasets = automl.registry.list(type="dataset")
 
+st.write(
+    "Currently saved datasets:", ", ".join(dataset.name for dataset in datasets)
+)
 csv_file = st.file_uploader("Upload your own csv dataset", ["csv"])
 
 if csv_file is not None:
@@ -15,5 +18,7 @@ if csv_file is not None:
     file_name = csv_file.name
     st.write(dataframe.head())
     dataset = Dataset.from_dataframe(dataframe, file_name, file_name)
-    automl._storage.save(dataset.save(dataframe), file_name)
-    automl._registry.register(dataset)
+    if dataset not in datasets:
+        automl._storage.save(dataset.save(dataframe), file_name)
+        automl._registry.register(dataset)
+    st.write("Go to modelling page to use the dataset.")
