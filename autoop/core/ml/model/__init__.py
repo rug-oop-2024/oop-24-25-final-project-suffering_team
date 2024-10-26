@@ -6,15 +6,17 @@ from autoop.core.ml.model.regression.lasso import Lasso
 from autoop.core.ml.model.regression.multiple_linear_regression import (
     MultipleLinearRegression,
 )
+from autoop.core.ml.model.regression.ridge import Ridge
 
 REGRESSION_MODELS = [
     "MultipleLinearRegression",
     "Lasso",
+    "Ridge",
 ]  # add your models as str here
 
 CLASSIFICATION_MODELS = ["KNearestNeighbors"]  # add your models as str here
 
 
 def get_model(model_name: str) -> Model:
-    """Factory function to get a model by name."""
+    """Get a model by name using this Factory Function."""
     raise NotImplementedError("To be implemented.")

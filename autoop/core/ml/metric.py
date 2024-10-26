@@ -177,7 +177,7 @@ class RSquared(Metric):
 
         Returns:
             float: The proportion of variance that can be explained
-                by the independent variables of the model between 0 and 1.
+                by the independent variables of the model between -∞ and 1.
         """
         self._check_dimensions(predictions, ground_truth)
 
