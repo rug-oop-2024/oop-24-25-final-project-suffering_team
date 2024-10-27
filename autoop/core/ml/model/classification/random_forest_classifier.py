@@ -1,28 +1,28 @@
 from autoop.core.ml.model.model import Model
 
 import numpy as np
-from sklearn.svm import LinearSVC as SkLinearSVC
+from sklearn.ensemble import RandomForestClassifier as SkRandomForestClassifier
 
 
-class LinearSVC(Model):
-    """A LinearSVC implementation of the Model class."""
+class RandomForestClassifier(Model):
+    """A RandomForestClassifier implementation of the Model class."""
 
     def __init__(self, *args, **kwargs):
         """Initialize the LinearSVC model with the provided parameters.
 
         Args:
-            *args: Positional arguments for LinearSVC's parameters.
-            **kwargs: Keyword arguments for LinearSVC's parameters.
+            *args: Positional arguments for RandomForestClassifier parameters.
+            **kwargs: Keyword arguments for RandomForestClassifier parameters.
         """
         super().__init__()
-        self._model = SkLinearSVC(*args, **kwargs)
+        self._model = SkRandomForestClassifier(*args, **kwargs)
         # Add hyper parameters to the parameters dictionary using the setter.
         new_parameters = self._model.get_params()
         self.parameters = new_parameters
         self.type = "classification"
 
     def fit(self, observations: np.ndarray, ground_truths: np.ndarray) -> None:
-        """Use the observations and ground_truths to train the LinearSVC model.
+        """Train the RandomForestClassifier model.
 
         Args:
             observations (np.ndarray): Observations used to train the model.
@@ -49,11 +49,7 @@ class LinearSVC(Model):
         # Train the model
         self._model.fit(observations, ground_truths)
 
-        # Add the coefficients and intercept to parameters using the setter.
-        self.parameters = {
-            "coefficients": np.array(self._model.coef_),
-            "intercept": np.atleast_1d(self._model.intercept_),
-        }
+        self.parameters = {"estimators": np.array(self._model.estimators_)}
 
         self._fitted = True
         self._n_features = observations.shape[1]

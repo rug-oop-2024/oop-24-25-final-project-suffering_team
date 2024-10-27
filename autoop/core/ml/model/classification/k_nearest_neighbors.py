@@ -1,20 +1,27 @@
 from autoop.core.ml.model.model import Model
 
 import numpy as np
+from sklearn.neighbors import KNeighborsClassifier as SkKNeighborsClassifier
 
 
 class KNearestNeighbors(Model):
     """A KNearestNeighbors implementation of the Model class."""
 
-    def __init__(self, k_value: int = 3):
+    def __init__(self, *args, k_value: int = 3, **kwargs):
         """Initialize model.
 
         Args:
             k_value (int): The number of closest neighbors to check.
         """
         super().__init__()
-        self.type = "classification"
         self.k = k_value
+        self._model = SkKNeighborsClassifier(
+            *args, n_neighbors=self.k, **kwargs
+        )
+        # Add hyper parameters to the parameters dictionary using the setter.
+        new_parameters = self._model.get_params()
+        self.parameters = new_parameters
+        self.type = "classification"
 
     @property
     def k(self) -> int:
@@ -51,37 +58,45 @@ class KNearestNeighbors(Model):
         return k_value
 
     def fit(self, observations: np.ndarray, ground_truths: np.ndarray) -> None:
-        """Store the observations and ground_truths in a dictionary.
+        """Fit the KNN model.
 
         Args:
             observations (np.ndarray):
                 Observations used to train the model. Row dimension is
                 samples, column dimension is variables.
             ground_truths (np.ndarray):
-                Ground_truths corresponding to theobservations used to
+                Ground_truths corresponding to the observations used to
                 train the model. Row dimension is samples.
 
         Raises:
             ValueError:
-                The number of ground_truths and observations should be equal.
+                If the number of ground truths and observations is not equal.
+            ValueError:
+                If k is exceeds the number of observations.
         """
         observation_rows = observations.shape[0]
         ground_truth_rows = ground_truths.shape[0]
         if observation_rows != ground_truth_rows:
             raise ValueError(
-                f"The number of observations ({observation_rows}) and ",
-                f"ground_truths ({ground_truth_rows}) ",
-                "should be equal.",
+                f"The number of observations ({observation_rows}) and "
+                f"ground_truths ({ground_truth_rows}) should be equal."
+            )
+
+        if self.k > observation_rows:
+            raise ValueError(
+                f"k ({self.k}) cannot be greater than the number of "
+                f"observations ({observation_rows})."
             )
 
         # If the ground truth is one-hot-encoded: extract label indices
         if ground_truths.ndim > 1:
             ground_truths = np.argmax(ground_truths, axis=1)
 
-        self.parameters = {
-            "observations": observations,
-            "ground_truth": ground_truths,
-        }
+        # Train the model
+        self._model.fit(observations, ground_truths)
+
+        self._fitted = True
+        self._n_features = observations.shape[1]
 
     def predict(self, observations: np.ndarray) -> np.ndarray:
         """Predict for each observation how it should be classified.
@@ -91,65 +106,9 @@ class KNearestNeighbors(Model):
                 The observation for which require classification. Row
                 dimension is samples, column dimension is variables.
 
-        Raises:
-            ValueError:
-                If the model has not been fitted.
-            ValueError:
-                If K is larger than the number of observations.
-
         Returns:
             np.ndarray:
                 The classifications of the observations.
         """
-        if (
-            "observations" not in self.parameters.keys()
-            or "ground_truth" not in self.parameters.keys()
-        ):
-            raise ValueError(
-                "Model not fitted. Call 'fit' with appropriate arguments "
-                "before using 'predict'"
-            )
-        if self.k > observations.shape[0]:
-            raise ValueError(
-                "k is larger than than the number of observations"
-            )
-
-        predictions = [
-            self._predict_single(observation) for observation in observations
-        ]
-        return np.array(predictions)
-
-    def _predict_single(self, observation: np.ndarray) -> int:
-        """Predict for a single observation how it should be classified.
-
-        This method looks at the labels of the k nearest neighbors and
-        chooses the label that is most common.
-
-        Args:
-            observations (np.ndarray):
-                The observation that needs to be classified.
-
-        Returns:
-            int:
-                The classification of the observation.
-        """
-        # Calculate the distance to each point
-        distances = np.linalg.norm(
-            observation - self.parameters["observations"], axis=1
-        )
-
-        # Find and store the k nearest labels
-        sorted_indices = np.argsort(distances)
-        k_neighbors_indices = sorted_indices[: self.k]
-        k_neighbors_labels = self.parameters["ground_truth"][
-            k_neighbors_indices
-        ]
-
-        # Find the occurrences of each unique label
-        unique_labels, counts = np.unique(
-            k_neighbors_labels, return_counts=True
-        )
-
-        # Find and return the label which has to most occurrences
-        max_index = np.argmax(counts)
-        return unique_labels[max_index]
+        self._check_predict_requirements(observations)
+        return self._model.predict(observations)

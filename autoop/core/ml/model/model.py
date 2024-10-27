@@ -11,7 +11,9 @@ class Model(ABC):
     def __init__(self):
         """Initialize model base class."""
         self._parameters = {}
-        self._type = "Type has not been set."  # Set type in subclass models
+        self._type = None  # Set type in subclass models
+        self._n_features = None
+        self._fitted = False
 
     @property
     def parameters(self) -> dict[str, np.ndarray]:
@@ -107,3 +109,28 @@ class Model(ABC):
                 The predictions for the observations.
         """
         pass
+
+    def _check_predict_requirements(self, observations: np.ndarray) -> None:
+        """Check if the observations can be used in the prediction model.
+
+        Args:
+            observations (np.ndarray): The observations that need predictions.
+
+        Raises:
+            ValueError: If the model has not been fitted.
+            ValueError: If observations is not 2D.
+            ValueError: If observations does not have the right number of
+                features.
+        """
+        if not self._fitted:
+            raise ValueError(
+                "Model not fitted. Call 'fit' with appropriate arguments"
+                "before using 'predict'"
+            )
+        if observations.ndim != 2:
+            raise ValueError("Observations must be 2D")
+        if observations.shape[1] != self._n_features:
+            raise ValueError(
+                f"Observations must have {self._n_features} features, "
+                f"but got {observations.shape[1]}."
+            )
