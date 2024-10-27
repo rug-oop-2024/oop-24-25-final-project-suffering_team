@@ -29,18 +29,8 @@ class LinearSVC(Model):
                 Row dimension is samples, column dimension is variables.
             ground_truths (np.ndarray): Ground_truths corresponding to the
                 observations used to train the model. Row dimension is samples.
-
-        Raises:
-            ValueError:
-                If the number of observations and ground_truths is not equal.
         """
-        observation_rows = observations.shape[0]
-        ground_truth_rows = ground_truths.shape[0]
-        if observation_rows != ground_truth_rows:
-            raise ValueError(
-                f"The number of observations ({observation_rows}) and ",
-                f"ground_truths ({ground_truth_rows}) should be equal.",
-            )
+        self._check_fit_requirements(observations, ground_truths)
 
         # If the ground truth is one-hot-encoded: extract label indices
         if ground_truths.ndim > 1:

@@ -37,19 +37,15 @@ class KNearestNeighbors(Model):
         """Validate the k attribute.
 
         Args:
-            value (int):
-                The value for k that needs to be checked. Must be greater
-                than 0.
+            k_value (int): The value for k that needs to be checked. Must be
+                greater than 0.
 
         Raises:
-            TypeError:
-                K must be an integer
-            ValueError:
-                K must be greater than 0
+            TypeError: If k_value is no an integer.
+            ValueError: If k not larger than 0.
 
         Returns:
-            int:
-                The checked value of k.
+            int: The checked value of k.
         """
         if not isinstance(k_value, int):
             raise TypeError("k must be an integer")
@@ -61,31 +57,17 @@ class KNearestNeighbors(Model):
         """Fit the KNN model.
 
         Args:
-            observations (np.ndarray):
-                Observations used to train the model. Row dimension is
-                samples, column dimension is variables.
-            ground_truths (np.ndarray):
-                Ground_truths corresponding to the observations used to
-                train the model. Row dimension is samples.
-
-        Raises:
-            ValueError:
-                If the number of ground truths and observations is not equal.
-            ValueError:
-                If k is exceeds the number of observations.
+            observations (np.ndarray): Observations used to train the model.
+                Row dimension is samples, column dimension is variables.
+            ground_truths (np.ndarray): Ground_truths corresponding to the
+                observations used to train the model. Row dimension is samples.
         """
-        observation_rows = observations.shape[0]
-        ground_truth_rows = ground_truths.shape[0]
-        if observation_rows != ground_truth_rows:
-            raise ValueError(
-                f"The number of observations ({observation_rows}) and "
-                f"ground_truths ({ground_truth_rows}) should be equal."
-            )
+        self._check_fit_requirements(observations, ground_truths)
 
-        if self.k > observation_rows:
+        if self.k > observations.shape[0]:
             raise ValueError(
                 f"k ({self.k}) cannot be greater than the number of "
-                f"observations ({observation_rows})."
+                f"observations ({observations.shape[0]})."
             )
 
         # If the ground truth is one-hot-encoded: extract label indices
@@ -99,16 +81,14 @@ class KNearestNeighbors(Model):
         self._n_features = observations.shape[1]
 
     def predict(self, observations: np.ndarray) -> np.ndarray:
-        """Predict for each observation how it should be classified.
+        """Use the model to predict values for observations.
 
         Args:
-            observations (np.ndarray):
-                The observation for which require classification. Row
-                dimension is samples, column dimension is variables.
+            observations (np.ndarray): The observations which need predictions.
+                Row dimension is samples, column dimension is variables.
 
         Returns:
-            np.ndarray:
-                The classifications of the observations.
+            np.ndarray: The classification of the observation.
         """
         self._check_predict_requirements(observations)
         return self._model.predict(observations)

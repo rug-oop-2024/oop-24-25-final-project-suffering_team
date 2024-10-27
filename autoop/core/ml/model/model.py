@@ -110,6 +110,31 @@ class Model(ABC):
         """
         pass
 
+    def _check_fit_requirements(
+        self, observations: np.ndarray, ground_truths: np.ndarray
+    ) -> None:
+        """Check if the model can be fit with the current input.
+
+        Args:
+            observations (np.ndarray): The observations that need checking.
+            ground_truths (np.ndarray): The ground_truths that need checking.
+
+        Raises:
+            ValueError: If the number of observations and ground_truths is not
+                equal.
+            ValueError: If there are less than two observations.
+        """
+        observation_rows = observations.shape[0]
+        ground_truth_rows = ground_truths.shape[0]
+        if observation_rows != ground_truth_rows:
+            raise ValueError(
+                f"The number of observations ({observation_rows}) and ",
+                f"ground_truths ({ground_truth_rows}) should be equal.",
+            )
+
+        if observation_rows < 2:
+            raise ValueError("At least two observations are needed.")
+
     def _check_predict_requirements(self, observations: np.ndarray) -> None:
         """Check if the observations can be used in the prediction model.
 

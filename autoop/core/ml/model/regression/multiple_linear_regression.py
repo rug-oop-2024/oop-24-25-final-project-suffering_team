@@ -1,103 +1,52 @@
 from autoop.core.ml.model.model import Model
 
 import numpy as np
+from sklearn.linear_model import LinearRegression as SkLinearRegression
 
 
 class MultipleLinearRegression(Model):
     """A MultipleLinearRegression implementation of the model class."""
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """Initialize the MultipleLinearRegression model."""
         super().__init__()
+        self._model = SkLinearRegression(*args, **kwargs)
+        # Add hyper parameters to the parameters dictionary using the setter.
+        new_parameters = self._model.get_params()
+        self.parameters = new_parameters
         self.type = "regression"
 
     def fit(self, observations: np.ndarray, ground_truths: np.ndarray) -> None:
         """Train the model using observations and ground_truths.
 
-        This method calculates the optimal parameter configuration to describe
-        the relation between observations and the corresponding ground_truths.
-
         Args:
-            observations (np.ndarray):
-                Observations used to train the model. Row dimension is
-                samples, column dimension is variables.
-            ground_truths (np.ndarray):
-                Ground_truths corresponding to the observations used to train
-                the model. Row dimension is samples.
-
-        Raises:
-            ValueError:
-                If the number of observations and ground_truths are not equal.
-            ValueError:
-                If there are less than two observations.
+            observations (np.ndarray): Observations used to train the model.
+                Row dimension is samples, column dimension is variables.
+            ground_truths (np.ndarray): Ground_truths corresponding to the
+                observations used to train the model. Row dimension is samples.
         """
-        # Add a column of ones for the intercept
-        observations = np.hstack(
-            [observations, np.ones((observations.shape[0], 1))]
-        )
+        self._check_fit_requirements(observations, ground_truths)
 
-        # Verify the shape of the input
-        if observations.shape[0] != ground_truths.shape[0]:
-            raise ValueError(
-                "The number of observations and ground_truths should be"
-                "the equal."
-            )
-        if observations.shape[0] <= 1:
-            raise ValueError("At least two observations are needed.")
+        # Train the model
+        self._model.fit(observations, ground_truths)
 
-        # Calculate the parameters using z_star = (X^T * X)^-1 * X^T * y
-        transposed_observations = np.transpose(observations)
-        result = np.matmul(transposed_observations, observations)
-        result = np.linalg.inv(result)
-        result = np.matmul(result, transposed_observations)
-        result = np.matmul(result, ground_truths)
-        self.parameters = {"parameters": result}
+        # Add the coefficients and intercept to parameters using the setter.
+        self.parameters = {
+            "coefficients": np.array(self._model.coef_),
+            "intercept": np.atleast_1d(self._model.intercept_),
+        }
+        self._fitted = True
+        self._n_features = observations.shape[1]
 
     def predict(self, observations: np.ndarray) -> np.ndarray:
-        """Return a prediction for the observations in the current model.
-
-        Uses the internal parameters to predict what the values should be of
-        given observations.
+        """Use the model to predict values for observations.
 
         Args:
-            observations (np.ndarray):
-                The observation for which a prediction is asked. Row
-                dimension is samples, column dimension is variables.
-
-        Raises:
-            ValueError:
-                If the model has not been fitted.
-            ValueError:
-                If observation columns do not match parameter rows.
+            observations (np.ndarray): The observations which need predictions.
+                Row dimension is samples, column dimension is variables.
 
         Returns:
-            np.ndarray:
-                The predictions for the given observations.
+            list: Predicted values for the observations.
         """
-        # Add a column of ones for the intercept
-        observations = np.hstack(
-            [observations, np.ones((observations.shape[0], 1))]
-        )
-
-        # Check for and store the parameters
-        params = self.parameters
-        if "parameters" not in params:
-            raise ValueError(
-                "Model not fitted. Call 'fit' with appropriate arguments"
-                "before using 'predict'"
-            )
-
-        parameter_matrix = params["parameters"]
-
-        # Parameter rows must equal observation columns
-        observation_columns = observations.shape[1]
-        parameter_rows = len(parameter_matrix)
-        if parameter_rows != observation_columns:
-            raise ValueError(
-                f"The number of observation columns ({observation_columns}) "
-                f"is not the same as the number of parameter rows"
-                f"({parameter_rows})."
-            )
-
-        # Calculate the prediction using y = X*w_star
-        return np.matmul(observations, parameter_matrix)
+        self._check_predict_requirements(observations)
+        return self._model.predict(observations)
