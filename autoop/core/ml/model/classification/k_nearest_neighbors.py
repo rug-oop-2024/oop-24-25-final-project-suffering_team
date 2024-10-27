@@ -7,7 +7,11 @@ class KNearestNeighbors(Model):
     """A KNearestNeighbors implementation of the Model class."""
 
     def __init__(self, k_value: int = 3):
-        """Initialize model."""
+        """Initialize model.
+
+        Args:
+            k_value (int): The number of closest neighbors to check.
+        """
         super().__init__()
         self.type = "classification"
         self.k = k_value
@@ -46,7 +50,7 @@ class KNearestNeighbors(Model):
             raise ValueError("k must be greater than 0")
         return k_value
 
-    def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
+    def fit(self, observations: np.ndarray, ground_truths: np.ndarray) -> None:
         """Store the observations and ground_truths in a dictionary.
 
         Args:
@@ -62,7 +66,7 @@ class KNearestNeighbors(Model):
                 The number of ground_truths and observations should be equal.
         """
         observation_rows = observations.shape[0]
-        ground_truth_rows = ground_truth.shape[0]
+        ground_truth_rows = ground_truths.shape[0]
         if observation_rows != ground_truth_rows:
             raise ValueError(
                 f"The number of observations ({observation_rows}) and ",
@@ -71,12 +75,12 @@ class KNearestNeighbors(Model):
             )
 
         # If the ground truth is one-hot-encoded: extract label indices
-        if ground_truth.ndim > 1:
-            ground_truth = np.argmax(ground_truth, axis=1)
+        if ground_truths.ndim > 1:
+            ground_truths = np.argmax(ground_truths, axis=1)
 
         self.parameters = {
             "observations": observations,
-            "ground_truth": ground_truth,
+            "ground_truth": ground_truths,
         }
 
     def predict(self, observations: np.ndarray) -> np.ndarray:

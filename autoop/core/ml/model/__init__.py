@@ -1,6 +1,7 @@
 from autoop.core.ml.model.classification.k_nearest_neighbors import (
-    KNearestNeighbors
+    KNearestNeighbors,
 )
+from autoop.core.ml.model.classification.linear_svc import LinearSVC
 from autoop.core.ml.model.model import Model
 from autoop.core.ml.model.regression.lasso import Lasso
 from autoop.core.ml.model.regression.multiple_linear_regression import (
@@ -15,7 +16,8 @@ REGRESSION_MODELS = [
 ]  # add your models as str here
 
 CLASSIFICATION_MODELS = [
-    "KNearestNeighbors"
+    "KNearestNeighbors",
+    "linear_svc",
 ]  # add your models as str here
 
 
@@ -30,4 +32,6 @@ def get_model(model_name: str) -> Model:
             return Ridge()
         case "KNearestNeighbors":
             return KNearestNeighbors()
-    raise ValueError("model doesn't exist.")
+        case "LinearSVC":
+            return LinearSVC()
+    raise ValueError(f"Model {model_name} doesn't exist.")
