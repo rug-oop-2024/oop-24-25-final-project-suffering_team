@@ -1,6 +1,6 @@
-import numpy as np
-
 from autoop.core.ml.model.model import Model
+
+import numpy as np
 
 
 class MultipleLinearRegression(Model):
@@ -27,9 +27,9 @@ class MultipleLinearRegression(Model):
 
         Raises:
             ValueError:
-                The number of observations and ground_truths must be equal.
+                If the number of observations and ground_truths are not equal.
             ValueError:
-                At least two observations are needed for regression.
+                If there are less than two observations.
         """
         # Add a column of ones for the intercept
         observations = np.hstack(
@@ -66,10 +66,9 @@ class MultipleLinearRegression(Model):
 
         Raises:
             ValueError:
-                There are no parameters, the model needs to be fitted first.
+                If the model has not been fitted.
             ValueError:
-                For predictions, the number of observation columns should
-                equal the number of parameter rows.
+                If observation columns do not match parameter rows.
 
         Returns:
             np.ndarray:

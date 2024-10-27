@@ -11,6 +11,7 @@ class Model(ABC):
     def __init__(self):
         """Initialize model base class."""
         self._parameters = {}
+        self._type = "Type has not been set."  # Set type in subclass models
 
     @property
     def parameters(self) -> dict[str, np.ndarray]:
@@ -44,6 +45,25 @@ class Model(ABC):
             self._validate_key(key)
 
         self._parameters.update(new_parameters)
+
+    @property
+    def type(self) -> str:
+        """Get the model type."""
+        return self._type
+
+    @type.setter
+    def type(self, model_type: str) -> None:
+        """Set the model type after checking that it is a string.
+
+        Args:
+            model_type (str): The type of the model, must be a string.
+
+        Raises:
+            TypeError: If model_type is not a string.
+        """
+        if not isinstance(model_type, str):
+            raise TypeError("Model type must be a string.")
+        self._type = model_type
 
     def _validate_key(self, key: str) -> None:
         """Validate individual keys for the parameters dictionary.

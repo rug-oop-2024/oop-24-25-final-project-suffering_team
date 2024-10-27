@@ -99,8 +99,8 @@ class Metric(ABC):
         """
         if len(predictions) != len(ground_truth):
             raise ValueError(
-                "The number of predictions must equal the number "
-                "of ground truth labels."
+                f"The number of predictions ({len(predictions)}) must equal ",
+                f"the number of ground truth labels ({len(ground_truth)}).",
             )
         if len(predictions) == 0:
             raise ValueError(
@@ -213,6 +213,10 @@ class Accuracy(Metric):
         """
         self._check_dimensions(predictions, ground_truth)
 
+        # If ground_truth is one-hot-encoded get the correct labels
+        if ground_truth.ndim > 1:
+            ground_truth = np.argmax(ground_truth, axis=1)
+
         correct_predictions = np.sum(predictions == ground_truth)
         return correct_predictions / len(predictions)
 
@@ -237,6 +241,10 @@ class Precision(Metric):
             float: The precision of the model between 0 and 1
         """
         self._check_dimensions(predictions, ground_truth)
+
+        if ground_truth.ndim > 1:
+            # The ground_truth is one-hot-encoded so get labels
+            ground_truth = np.argmax(ground_truth, axis=1)
 
         unique_labels = np.unique(ground_truth)
         num_unique_labels = len(unique_labels)
@@ -306,6 +314,10 @@ class Recall(Metric):
             float: The recall of the model between 0 and 1
         """
         self._check_dimensions(predictions, ground_truth)
+
+        if ground_truth.ndim > 1:
+            # The ground_truth is one-hot-encoded so get labels
+            ground_truth = np.argmax(ground_truth, axis=1)
 
         unique_labels = np.unique(ground_truth)
         num_unique_labels = len(unique_labels)

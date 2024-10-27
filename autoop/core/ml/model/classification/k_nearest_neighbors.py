@@ -1,23 +1,29 @@
-from collections import Counter
-
-import numpy as np
-from pydantic import BaseModel, Field, field_validator
-
 from autoop.core.ml.model.model import Model
 
+import numpy as np
 
-class KNearestNeighbors(Model, BaseModel):
+
+class KNearestNeighbors(Model):
     """A KNearestNeighbors implementation of the Model class."""
 
-    k: int = Field(default=3)
-
-    def __init__(self):
+    def __init__(self, k_value: int = 3):
         """Initialize model."""
         super().__init__()
+        self.type = "classification"
+        self.k = k_value
 
-    @field_validator("k")
-    def k_greater_than_zero(cls, value: int) -> int:
-        """Validate the k field.
+    @property
+    def k(self) -> int:
+        """Get the value of k."""
+        return self._k
+
+    @k.setter
+    def k(self, value: int) -> None:
+        """Set the value of k with validation."""
+        self._k = self._validate_k(value)
+
+    def _validate_k(self, k_value: int) -> int:
+        """Validate the k attribute.
 
         Args:
             value (int):
@@ -34,11 +40,11 @@ class KNearestNeighbors(Model, BaseModel):
             int:
                 The checked value of k.
         """
-        if not isinstance(value, int):
+        if not isinstance(k_value, int):
             raise TypeError("k must be an integer")
-        if value <= 0:
+        if k_value <= 0:
             raise ValueError("k must be greater than 0")
-        return value
+        return k_value
 
     def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
         """Store the observations and ground_truths in a dictionary.
@@ -59,9 +65,15 @@ class KNearestNeighbors(Model, BaseModel):
         ground_truth_rows = ground_truth.shape[0]
         if observation_rows != ground_truth_rows:
             raise ValueError(
-                "The number of observations and ground_truths "
-                "should be the equal."
+                f"The number of observations ({observation_rows}) and ",
+                f"ground_truths ({ground_truth_rows}) ",
+                "should be equal.",
             )
+
+        # If the ground truth is one-hot-encoded: extract label indices
+        if ground_truth.ndim > 1:
+            ground_truth = np.argmax(ground_truth, axis=1)
+
         self.parameters = {
             "observations": observations,
             "ground_truth": ground_truth,
@@ -77,9 +89,9 @@ class KNearestNeighbors(Model, BaseModel):
 
         Raises:
             ValueError:
-                There are no parameters, the model needs to be fitted first.
+                If the model has not been fitted.
             ValueError:
-                K should not be larger than the number of observations.
+                If K is larger than the number of observations.
 
         Returns:
             np.ndarray:
@@ -94,7 +106,9 @@ class KNearestNeighbors(Model, BaseModel):
                 "before using 'predict'"
             )
         if self.k > observations.shape[0]:
-            raise ValueError("k is larger than than the number of observations")
+            raise ValueError(
+                "k is larger than than the number of observations"
+            )
 
         predictions = [
             self._predict_single(observation) for observation in observations
@@ -120,11 +134,18 @@ class KNearestNeighbors(Model, BaseModel):
             observation - self.parameters["observations"], axis=1
         )
 
-        # Sort and return the most common label in the k nearest points
+        # Find and store the k nearest labels
         sorted_indices = np.argsort(distances)
         k_neighbors_indices = sorted_indices[: self.k]
-        k_neighbors_nearest_labels = [
-            self.parameters["ground_truth"][i] for i in k_neighbors_indices
+        k_neighbors_labels = self.parameters["ground_truth"][
+            k_neighbors_indices
         ]
-        most_common = Counter(k_neighbors_nearest_labels).most_common(1)
-        return most_common[0][0]
+
+        # Find the occurrences of each unique label
+        unique_labels, counts = np.unique(
+            k_neighbors_labels, return_counts=True
+        )
+
+        # Find and return the label which has to most occurrences
+        max_index = np.argmax(counts)
+        return unique_labels[max_index]
