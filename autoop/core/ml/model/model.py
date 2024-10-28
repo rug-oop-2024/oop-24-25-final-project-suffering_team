@@ -11,6 +11,9 @@ class Model(ABC):
     def __init__(self):
         """Initialize model base class."""
         self._parameters = {}
+        self._type = None  # Set type in subclass models
+        self._n_features = None
+        self._fitted = False
 
     @property
     def parameters(self) -> dict[str, np.ndarray]:
@@ -44,6 +47,25 @@ class Model(ABC):
             self._validate_key(key)
 
         self._parameters.update(new_parameters)
+
+    @property
+    def type(self) -> str:
+        """Get the model type."""
+        return self._type
+
+    @type.setter
+    def type(self, model_type: str) -> None:
+        """Set the model type after checking that it is a string.
+
+        Args:
+            model_type (str): The type of the model, must be a string.
+
+        Raises:
+            TypeError: If model_type is not a string.
+        """
+        if not isinstance(model_type, str):
+            raise TypeError("Model type must be a string.")
+        self._type = model_type
 
     def _validate_key(self, key: str) -> None:
         """Validate individual keys for the parameters dictionary.
@@ -87,3 +109,53 @@ class Model(ABC):
                 The predictions for the observations.
         """
         pass
+
+    def _check_fit_requirements(
+        self, observations: np.ndarray, ground_truths: np.ndarray
+    ) -> None:
+        """Check if the model can be fit with the current input.
+
+        Args:
+            observations (np.ndarray): The observations that need checking.
+            ground_truths (np.ndarray): The ground_truths that need checking.
+
+        Raises:
+            ValueError: If the number of observations and ground_truths is not
+                equal.
+            ValueError: If there are less than two observations.
+        """
+        observation_rows = observations.shape[0]
+        ground_truth_rows = ground_truths.shape[0]
+        if observation_rows != ground_truth_rows:
+            raise ValueError(
+                f"The number of observations ({observation_rows}) and ",
+                f"ground_truths ({ground_truth_rows}) should be equal.",
+            )
+
+        if observation_rows < 2:
+            raise ValueError("At least two observations are needed.")
+
+    def _check_predict_requirements(self, observations: np.ndarray) -> None:
+        """Check if the observations can be used in the prediction model.
+
+        Args:
+            observations (np.ndarray): The observations that need predictions.
+
+        Raises:
+            ValueError: If the model has not been fitted.
+            ValueError: If observations is not 2D.
+            ValueError: If observations does not have the right number of
+                features.
+        """
+        if not self._fitted:
+            raise ValueError(
+                "Model not fitted. Call 'fit' with appropriate arguments"
+                "before using 'predict'"
+            )
+        if observations.ndim != 2:
+            raise ValueError("Observations must be 2D")
+        if observations.shape[1] != self._n_features:
+            raise ValueError(
+                f"Observations must have {self._n_features} features, "
+                f"but got {observations.shape[1]}."
+            )

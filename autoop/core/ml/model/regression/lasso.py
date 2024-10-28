@@ -1,7 +1,7 @@
+from autoop.core.ml.model.model import Model
+
 import numpy as np
 from sklearn.linear_model import Lasso as SkLasso
-
-from autoop.core.ml.model.model import Model
 
 
 class Lasso(Model):
@@ -29,21 +29,8 @@ class Lasso(Model):
                 Row dimension is samples, column dimension is variables.
             ground_truths (np.ndarray): Ground_truths corresponding to the
                 observations used to train the model. Row dimension is samples.
-
-        Raises:
-            ValueError:
-                The number of observations and ground_truths must be equal.
-            ValueError:
-                At least two observations are needed for regression.
         """
-        # Verify the input
-        if observations.shape[0] != ground_truths.shape[0]:
-            raise ValueError(
-                "The number of observations and ground_truths should be"
-                "the equal."
-            )
-        if observations.shape[0] <= 1:
-            raise ValueError("At least two observations are needed.")
+        self._check_fit_requirements(observations, ground_truths)
 
         # Train the model
         self._model.fit(observations, ground_truths)
@@ -53,6 +40,8 @@ class Lasso(Model):
             "coefficients": np.array(self._model.coef_),
             "intercept": np.atleast_1d(self._model.intercept_),
         }
+        self._fitted = True
+        self._n_features = observations.shape[1]
 
     def predict(self, observations: np.ndarray) -> np.ndarray:
         """Use the model to predict values for observations.
@@ -61,26 +50,8 @@ class Lasso(Model):
             observations (np.ndarray): The observations which need predictions.
                 Row dimension is samples, column dimension is variables.
 
-        Raises:
-            ValueError: There are no parameters, the model needs to be fitted
-                first.
-
         Returns:
             list: Predicted values for the observations.
         """
-        if "coefficients" not in self.parameters:
-            raise ValueError(
-                "Model not fitted. Call 'fit' with appropriate arguments"
-                "before using 'predict'"
-            )
-
-        observation_columns = observations.shape[1]
-        coefficients = self.parameters["coefficients"]
-
-        # The number of coefficients should match the number of observation
-        if len(coefficients) != observation_columns:
-            raise ValueError(
-                f"The number of observation columns ({observation_columns}) "
-                f"must match the number of coefficients ({len(coefficients)})."
-            )
+        self._check_predict_requirements(observations)
         return self._model.predict(observations)

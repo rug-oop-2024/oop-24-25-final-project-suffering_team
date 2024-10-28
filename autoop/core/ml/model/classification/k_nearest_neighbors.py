@@ -1,130 +1,94 @@
-from collections import Counter
-
-import numpy as np
-from pydantic import BaseModel, Field, field_validator
-
 from autoop.core.ml.model.model import Model
 
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier as SkKNeighborsClassifier
 
-class KNearestNeighbors(Model, BaseModel):
+
+class KNearestNeighbors(Model):
     """A KNearestNeighbors implementation of the Model class."""
 
-    k: int = Field(default=3)
-
-    def __init__(self):
-        """Initialize model."""
-        super().__init__()
-
-    @field_validator("k")
-    def k_greater_than_zero(cls, value: int) -> int:
-        """Validate the k field.
+    def __init__(self, *args, k_value: int = 3, **kwargs):
+        """Initialize model.
 
         Args:
-            value (int):
-                The value for k that needs to be checked. Must be greater
-                than 0.
+            k_value (int): The number of closest neighbors to check.
+        """
+        super().__init__()
+        self.k = k_value
+        self._model = SkKNeighborsClassifier(
+            *args, n_neighbors=self.k, **kwargs
+        )
+        # Add hyper parameters to the parameters dictionary using the setter.
+        new_parameters = self._model.get_params()
+        self.parameters = new_parameters
+        self.type = "classification"
+
+    @property
+    def k(self) -> int:
+        """Get the value of k."""
+        return self._k
+
+    @k.setter
+    def k(self, value: int) -> None:
+        """Set the value of k with validation."""
+        self._k = self._validate_k(value)
+
+    def _validate_k(self, k_value: int) -> int:
+        """Validate the k attribute.
+
+        Args:
+            k_value (int): The value for k that needs to be checked. Must be
+                greater than 0.
 
         Raises:
-            TypeError:
-                K must be an integer
-            ValueError:
-                K must be greater than 0
+            TypeError: If k_value is no an integer.
+            ValueError: If k not larger than 0.
 
         Returns:
-            int:
-                The checked value of k.
+            int: The checked value of k.
         """
-        if not isinstance(value, int):
+        if not isinstance(k_value, int):
             raise TypeError("k must be an integer")
-        if value <= 0:
+        if k_value <= 0:
             raise ValueError("k must be greater than 0")
-        return value
+        return k_value
 
-    def fit(self, observations: np.ndarray, ground_truth: np.ndarray) -> None:
-        """Store the observations and ground_truths in a dictionary.
+    def fit(self, observations: np.ndarray, ground_truths: np.ndarray) -> None:
+        """Fit the KNN model.
 
         Args:
-            observations (np.ndarray):
-                Observations used to train the model. Row dimension is
-                samples, column dimension is variables.
-            ground_truths (np.ndarray):
-                Ground_truths corresponding to theobservations used to
-                train the model. Row dimension is samples.
-
-        Raises:
-            ValueError:
-                The number of ground_truths and observations should be equal.
+            observations (np.ndarray): Observations used to train the model.
+                Row dimension is samples, column dimension is variables.
+            ground_truths (np.ndarray): Ground_truths corresponding to the
+                observations used to train the model. Row dimension is samples.
         """
-        observation_rows = observations.shape[0]
-        ground_truth_rows = ground_truth.shape[0]
-        if observation_rows != ground_truth_rows:
+        self._check_fit_requirements(observations, ground_truths)
+
+        if self.k > observations.shape[0]:
             raise ValueError(
-                "The number of observations and ground_truths "
-                "should be the equal."
+                f"k ({self.k}) cannot be greater than the number of "
+                f"observations ({observations.shape[0]})."
             )
-        self.parameters = {
-            "observations": observations,
-            "ground_truth": ground_truth,
-        }
+
+        # If the ground truth is one-hot-encoded: extract label indices
+        if ground_truths.ndim > 1:
+            ground_truths = np.argmax(ground_truths, axis=1)
+
+        # Train the model
+        self._model.fit(observations, ground_truths)
+
+        self._fitted = True
+        self._n_features = observations.shape[1]
 
     def predict(self, observations: np.ndarray) -> np.ndarray:
-        """Predict for each observation how it should be classified.
+        """Use the model to predict values for observations.
 
         Args:
-            observations (np.ndarray):
-                The observation for which require classification. Row
-                dimension is samples, column dimension is variables.
-
-        Raises:
-            ValueError:
-                There are no parameters, the model needs to be fitted first.
-            ValueError:
-                K should not be larger than the number of observations.
+            observations (np.ndarray): The observations which need predictions.
+                Row dimension is samples, column dimension is variables.
 
         Returns:
-            np.ndarray:
-                The classifications of the observations.
+            np.ndarray: The classification of the observation.
         """
-        if (
-            "observations" not in self.parameters.keys()
-            or "ground_truth" not in self.parameters.keys()
-        ):
-            raise ValueError(
-                "Model not fitted. Call 'fit' with appropriate arguments "
-                "before using 'predict'"
-            )
-        if self.k > observations.shape[0]:
-            raise ValueError("k is larger than than the number of observations")
-
-        predictions = [
-            self._predict_single(observation) for observation in observations
-        ]
-        return np.array(predictions)
-
-    def _predict_single(self, observation: np.ndarray) -> int:
-        """Predict for a single observation how it should be classified.
-
-        This method looks at the labels of the k nearest neighbors and
-        chooses the label that is most common.
-
-        Args:
-            observations (np.ndarray):
-                The observation that needs to be classified.
-
-        Returns:
-            int:
-                The classification of the observation.
-        """
-        # Calculate the distance to each point
-        distances = np.linalg.norm(
-            observation - self.parameters["observations"], axis=1
-        )
-
-        # Sort and return the most common label in the k nearest points
-        sorted_indices = np.argsort(distances)
-        k_neighbors_indices = sorted_indices[: self.k]
-        k_neighbors_nearest_labels = [
-            self.parameters["ground_truth"][i] for i in k_neighbors_indices
-        ]
-        most_common = Counter(k_neighbors_nearest_labels).most_common(1)
-        return most_common[0][0]
+        self._check_predict_requirements(observations)
+        return self._model.predict(observations)
