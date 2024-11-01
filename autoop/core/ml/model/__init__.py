@@ -21,7 +21,7 @@ REGRESSION_MODELS = [
 CLASSIFICATION_MODELS = [
     "KNearestNeighbors",
     "LinearSVC",
-    "RandomForestClassification",
+    "RandomForestClassifier",
 ]  # add your models as str here
 
 
