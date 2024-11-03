@@ -130,7 +130,7 @@ class MeanSquaredError(Metric):
         self._check_dimensions(predictions, ground_truth)
 
         total_squared_error = np.sum((ground_truth - predictions) ** 2)
-        return total_squared_error / len(predictions)
+        return float(total_squared_error / len(predictions))
 
 
 class MeanAbsoluteError(Metric):
@@ -157,7 +157,7 @@ class MeanAbsoluteError(Metric):
         for index in range(len(predictions)):
             value = abs(ground_truth[index] - predictions[index])
             total_absolute_error += value
-        return total_absolute_error / len(predictions)
+        return float(total_absolute_error / len(predictions))
 
 
 class RSquared(Metric):
@@ -189,7 +189,7 @@ class RSquared(Metric):
         if sum_of_squares_total == 0:
             return float("nan")
 
-        return 1 - residual_sum_of_squares / sum_of_squares_total
+        return float(1 - residual_sum_of_squares / sum_of_squares_total)
 
 
 class Accuracy(Metric):
@@ -218,7 +218,7 @@ class Accuracy(Metric):
             ground_truth = np.argmax(ground_truth, axis=1)
 
         correct_predictions = np.sum(predictions == ground_truth)
-        return correct_predictions / len(predictions)
+        return float(correct_predictions / len(predictions))
 
 
 class Precision(Metric):
@@ -256,7 +256,7 @@ class Precision(Metric):
                 unique_label, predictions, ground_truth
             )
 
-        return total_precision / num_unique_labels
+        return float(total_precision / num_unique_labels)
 
     def _calculate_label_precision(
         self,
@@ -289,7 +289,7 @@ class Precision(Metric):
 
         # Avoid dividing by zero
         if true_pos + false_pos > 0:
-            return true_pos / (true_pos + false_pos)
+            return float(true_pos / (true_pos + false_pos))
 
         return 0.0
 
@@ -329,7 +329,7 @@ class Recall(Metric):
                 unique_label, predictions, ground_truth
             )
 
-        return total_recall / num_unique_labels
+        return float(total_recall / num_unique_labels)
 
     def _calculate_label_recall(
         self,
@@ -362,6 +362,6 @@ class Recall(Metric):
 
         # Avoid dividing by zero
         if true_pos + false_neg > 0:
-            return true_pos / (true_pos + false_neg)
+            return float(true_pos / (true_pos + false_neg))
 
         return 0.0
