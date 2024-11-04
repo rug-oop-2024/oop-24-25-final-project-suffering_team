@@ -176,10 +176,13 @@ if selected_model and selected_metrics and selected_features:
         for artifact in all_artifacts:
             if artifact.name == "pipeline_config":
                 artifact.name = pipeline_name
+                artifact.asset_path = pipeline_name
                 artifact.version = pipeline_version
                 artifact.type = "pipeline"
+                artifact.id = f"{artifact._base64_encode(artifact.asset_path)}-{artifact.version}"
                 pipeline_artifact = artifact
             else:
+                automl._registry.register(artifact)
                 pipeline_artifact.save_metadata(artifact)
         automl._registry.register(pipeline_artifact)
         st.write(pipeline_artifact)
