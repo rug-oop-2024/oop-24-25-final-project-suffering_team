@@ -45,7 +45,7 @@ selected_metrics = False
 selected_features = False
 selected_model = False
 
-st.subheader("Dataset Selection:")
+st.write("# Dataset Selection:")
 name = st.selectbox(
     "Choose dataset to use on model or upload your own in datasets page:",
     (dataset.name for dataset in datasets),
@@ -68,7 +68,7 @@ if name is not None:
         version=chosen_data.version,
     )
     features = detect_feature_types(correct_dataset)
-    st.subheader("Feature Selection:")
+    st.write("## Feature Selection:")
     target = st.selectbox(
         "Select target column for prediction:", features, index=None
     )
@@ -88,7 +88,7 @@ if name is not None:
             selected_features = True
         feature_type = target.type
 
-        st.subheader("Model Selection:")
+        st.write("## Model Selection:")
         if feature_type == "numerical":
             st.write("Task type is regression.")
             model = st.selectbox("Choose models to use:", REGRESSION_MODELS)
@@ -131,7 +131,7 @@ if selected_model and selected_metrics and selected_features:
         split=split,
     )
     # Pipeline summary
-    st.subheader("Pipeline Summary")
+    st.write("## Pipeline Summary")
     st.write("The following pipeline has been created:")
     st.write("- **Dataset**:", correct_dataset.name)
     st.write("- **Target Feature**:", target.name)
@@ -153,19 +153,19 @@ if selected_model and selected_metrics and selected_features:
         test_result = result["test_metrics"]
         predictions = result["predictions"]
 
-        st.header("Pipeline Results")
+        st.write("## Pipeline Results")
 
-        st.subheader("Train metrics:")
+        st.write("### Train metrics:")
         for metric_result in train_result:
             metric_name = metric_result[0].__class__.__name__
             st.write(f"- **{metric_name}**: {metric_result[1]}")
 
-        st.subheader("Test metrics:")
+        st.write("### Test metrics:")
         for metric_result in test_result:
             metric_name = metric_result[0].__class__.__name__
             st.write(f"- **{metric_name}**: {metric_result[1]}")
 
-        st.subheader("Predictions:")
+        st.write("### Predictions:")
         st.code(predictions)
     pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
     pipeline_version = st.text_input(
