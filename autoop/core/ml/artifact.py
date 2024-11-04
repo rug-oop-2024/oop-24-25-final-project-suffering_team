@@ -34,13 +34,13 @@ class Artifact:
         self.metadata = metadata if metadata is not None else {}
         self.id = f"{self._base64_encode(self.asset_path)}-{self.version}"
 
-    def save_metadata(self, name: str):
+    def save_metadata(self, artifact: "Artifact"):
         """Save new metadata.
 
         Args:
             name (str): name of metadata
         """
-        self.metadata.update({name: self.id})
+        self.metadata.update({artifact.name: artifact.id})
 
     @staticmethod
     def _base64_encode(value: str) -> str:

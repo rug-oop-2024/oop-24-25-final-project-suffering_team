@@ -1,6 +1,9 @@
+import pickle
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from typing import Any
+
+from autoop.core.ml.artifact import Artifact
 
 import numpy as np
 
@@ -159,3 +162,19 @@ class Model(ABC):
                 f"Observations must have {self._n_features} features, "
                 f"but got {observations.shape[1]}."
             )
+
+    def to_artifact(self, name: str) -> "Artifact":
+        """Turn model into artifact.
+
+        Args:
+            name (str): name of artifact
+
+        Returns:
+            Artifact: model as an artifact
+        """
+        model_data = {
+            "parameters": self._parameters,
+            "features": self._n_features,
+            "fitted": self._fitted,
+        }
+        return Artifact(name=name, data=pickle.dumps(model_data))
