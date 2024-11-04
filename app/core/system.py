@@ -4,9 +4,12 @@ from autoop.core.database import Database
 from autoop.core.ml.artifact import Artifact
 from autoop.core.storage import LocalStorage, Storage
 
+import streamlit as st
+
 
 class ArtifactRegistry:
     """Class to register artifacts."""
+
     def __init__(self, database: Database, storage: Storage):
         """Initialize registry.
 
@@ -69,6 +72,7 @@ class ArtifactRegistry:
             artifact_id (str): id of artifact
         """
         data = self._database.get("artifacts", artifact_id)
+        st.write(data)
         return Artifact(
             name=data["name"],
             version=data["version"],
@@ -76,7 +80,7 @@ class ArtifactRegistry:
             tags=data["tags"],
             metadata=data["metadata"],
             data=self._storage.load(data["asset_path"]),
-            type=data["type"],
+            artifact_type=data["type"],
         )
 
     def delete(self, artifact_id: str):
@@ -92,6 +96,7 @@ class ArtifactRegistry:
 
 class AutoMLSystem:
     """Class for system."""
+
     _instance = None
 
     def __init__(self, storage: LocalStorage, database: Database):
