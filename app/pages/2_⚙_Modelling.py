@@ -45,6 +45,7 @@ selected_metrics = False
 selected_features = False
 selected_model = False
 
+st.subheader("Dataset Selection:")
 name = st.selectbox(
     "Choose dataset to use on model or upload your own in datasets page:",
     (dataset.name for dataset in datasets),
@@ -67,6 +68,7 @@ if name is not None:
         version=chosen_data.version,
     )
     features = detect_feature_types(correct_dataset)
+    st.subheader("Feature Selection:")
     target = st.selectbox(
         "Select target column for prediction:", features, index=None
     )
@@ -86,6 +88,7 @@ if name is not None:
             selected_features = True
         feature_type = target.type
 
+        st.subheader("Model Selection:")
         if feature_type == "numerical":
             st.write("Task type is regression.")
             model = st.selectbox("Choose models to use:", REGRESSION_MODELS)
@@ -117,7 +120,7 @@ if name is not None:
 
 if selected_model and selected_metrics and selected_features:
     split = st.slider(
-        "Select how much of the data is for training", 0.01, 0.99, 0.80
+        "Select how much of the data is for training.", 0.01, 0.99, 0.80
     )
     pipeline = Pipeline(
         metrics=metrics,
@@ -127,10 +130,43 @@ if selected_model and selected_metrics and selected_features:
         target_feature=target,
         split=split,
     )
-    st.write("Current pipeline:", pipeline)
+    # Pipeline summary
+    st.subheader("Pipeline Summary")
+    st.write("The following pipeline has been created:")
+    st.write("- **Dataset**:", correct_dataset.name)
+    st.write("- **Target Feature**:", target.name)
+    st.write(
+        "- **Input Features**:",
+        ", ".join(feature.name for feature in input_features),
+    )
+    st.write("- **Model**:", model.__class__.__name__)
+    st.write(
+        "- **Metrics**:",
+        ", ".join(metric.__class__.__name__ for metric in metrics),
+    )
+    st.write("- **Training Split**:", f"{split:.0%} of data")
     if st.button("Execute pipeline"):
         result = pipeline.execute()
-        st.write(result)
+
+        # Extract results
+        train_result = result["train_metrics"]
+        test_result = result["test_metrics"]
+        predictions = result["predictions"]
+
+        st.header("Pipeline Results")
+
+        st.subheader("Train metrics:")
+        for metric_result in train_result:
+            metric_name = metric_result[0].__class__.__name__
+            st.write(f"- **{metric_name}**: {metric_result[1]}")
+
+        st.subheader("Test metrics:")
+        for metric_result in test_result:
+            metric_name = metric_result[0].__class__.__name__
+            st.write(f"- **{metric_name}**: {metric_result[1]}")
+
+        st.subheader("Predictions:")
+        st.code(predictions)
     pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
     pipeline_version = st.text_input(
         "Give the version of the pipeline", "1.0.0"

@@ -6,8 +6,11 @@ import streamlit as st
 
 automl = AutoMLSystem.get_instance()
 
+st.set_page_config(page_title="Datasets", page_icon="📊")
+
 datasets = automl.registry.list(type="dataset")
 
+st.write("# 📊 Datasets")
 st.write(
     "Currently saved datasets:",
     ", ".join(dataset.name for dataset in datasets),
