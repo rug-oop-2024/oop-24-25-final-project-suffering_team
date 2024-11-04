@@ -118,6 +118,7 @@ if name is not None:
             metrics = [get_metric(metric) for metric in metric_names]
             selected_metrics = len(metrics) >= 1
 
+
 if selected_model and selected_metrics and selected_features:
     split = st.slider(
         "Select how much of the data is for training.", 0.01, 0.99, 0.80
@@ -160,6 +161,7 @@ if selected_model and selected_metrics and selected_features:
         train_result = result["train_metrics"]
         test_result = result["test_metrics"]
         predictions = result["predictions"]
+        # Get the original labels
         if target.type == "categorical":
             unique_target_values = full_data[target.name].unique()
             predictions = [unique_target_values[pred] for pred in predictions]
@@ -189,6 +191,7 @@ if selected_model and selected_metrics and selected_features:
                 "more.",
             )
 
+    # The pipeline needs to have a trained model before it can be saved.
     st.write("## Save Pipeline:")
     pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
     pipeline_version = st.text_input(
@@ -202,7 +205,10 @@ if selected_model and selected_metrics and selected_features:
                 artifact.asset_path = pipeline_name
                 artifact.version = pipeline_version
                 artifact.type = "pipeline"
-                artifact.id = f"{artifact._base64_encode(artifact.asset_path)}-{artifact.version}"
+
+                encoded_path = artifact._base64_encode(artifact.asset_path)
+                artifact.id = f"{encoded_path}-{artifact.version}"
+
                 pipeline_artifact = artifact
             else:
                 automl._registry.register(artifact)

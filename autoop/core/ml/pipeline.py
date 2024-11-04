@@ -1,5 +1,4 @@
 import pickle
-
 from typing import List
 
 from autoop.core.ml.artifact import Artifact
@@ -65,14 +64,14 @@ class Pipeline:
     def __str__(self) -> str:
         """Return a string representation of the most important attributes."""
         return f"""
-Pipeline(
-    model={self._model.type},\n
-    input_features={list(map(str, self._input_features))},\n
-    target_feature={str(self._target_feature)},\n
-    split={self._split},\n
-    metrics={list(map(str, self._metrics))},
-)
-"""
+            Pipeline(
+                model={self._model.type},\n
+                input_features={list(map(str, self._input_features))},\n
+                target_feature={str(self._target_feature)},\n
+                split={self._split},\n
+                metrics={list(map(str, self._metrics))},
+        )
+        """
 
     @property
     def model(self) -> Model:
@@ -94,10 +93,21 @@ Pipeline(
                 data = pickle.dumps(data)
                 artifacts.append(Artifact(name=name, data=data))
         pipeline_data = {
+            "dataset": self._dataset,
             "input_features": self._input_features,
             "target_feature": self._target_feature,
             "split": self._split,
+            "metrics": self._metrics,
         }
+        # Store metric results if they exist.
+        if hasattr(self, "_train_metrics_results"):
+            pipeline_data.update(
+                {
+                    "train_results": self._train_metrics_results,
+                    "test_results": self._metrics_results,
+                }
+            )
+
         artifacts.append(
             Artifact(name="pipeline_config", data=pickle.dumps(pipeline_data))
         )

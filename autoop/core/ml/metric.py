@@ -1,14 +1,16 @@
 from abc import ABC, abstractmethod
 
+from autoop.core.ml.artifact import Artifact
+
 import numpy as np
 
 REGRESSION_METRICS = [
-    "mean_squared_error",
-    "mean_absolute_error",
-    "r_squared",
+    "MeanSquaredError",
+    "MeanAbsoluteError",
+    "RSquared",
 ]
 
-CLASSIFICATION_METRICS = ["accuracy", "precision", "recall"]
+CLASSIFICATION_METRICS = ["Accuracy", "Precision", "Recall"]
 
 
 def get_metric(name: str) -> "Metric":
@@ -32,17 +34,17 @@ def get_metric(name: str) -> "Metric":
         )
 
     match name:
-        case "mean_squared_error":
+        case "MeanSquaredError":
             return MeanSquaredError()
-        case "mean_absolute_error":
+        case "MeanAbsoluteError":
             return MeanAbsoluteError()
-        case "r_squared":
+        case "RSquared":
             return RSquared()
-        case "accuracy":
+        case "Accuracy":
             return Accuracy()
-        case "precision":
+        case "Precision":
             return Precision()
-        case "recall":
+        case "Recall":
             return Recall()
 
     raise ValueError(f"No metric found for the name: '{name}'.")
@@ -108,7 +110,6 @@ class Metric(ABC):
             )
 
 
-# add here concrete implementations of the Metric class
 class MeanSquaredError(Metric):
     """Create a metric class for mean squared error in regression."""
 
