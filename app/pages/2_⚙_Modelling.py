@@ -45,7 +45,7 @@ selected_metrics = False
 selected_features = False
 selected_model = False
 
-st.write("# Dataset Selection:")
+st.write("## Dataset Selection:")
 name = st.selectbox(
     "Choose dataset to use on model or upload your own in datasets page:",
     (dataset.name for dataset in datasets),
@@ -131,7 +131,7 @@ if selected_model and selected_metrics and selected_features:
         split=split,
     )
     # Pipeline summary
-    st.write("## Pipeline Summary")
+    st.write("## Pipeline Summary:")
     st.write("The following pipeline has been created:")
     st.write("- **Dataset**:", correct_dataset.name)
     st.write("- **Target Feature**:", target.name)
@@ -145,6 +145,14 @@ if selected_model and selected_metrics and selected_features:
         ", ".join(metric.__class__.__name__ for metric in metrics),
     )
     st.write("- **Training Split**:", f"{split:.0%} of data")
+
+    # Not all predictions should be showed if there are many predictions
+    max_display = st.number_input(
+        "Enter the maximum number of predictions to display. (0=all))",
+        min_value=0,
+        value=50,
+        step=1,
+    )
     if st.button("Execute pipeline"):
         result = pipeline.execute()
 
@@ -153,7 +161,7 @@ if selected_model and selected_metrics and selected_features:
         test_result = result["test_metrics"]
         predictions = result["predictions"]
 
-        st.write("## Pipeline Results")
+        st.write("## Pipeline Results:")
 
         st.write("### Train metrics:")
         for metric_result in train_result:
@@ -166,7 +174,19 @@ if selected_model and selected_metrics and selected_features:
             st.write(f"- **{metric_name}**: {metric_result[1]}")
 
         st.write("### Predictions:")
-        st.code(predictions)
+        if max_display == 0 or max_display >= len(predictions):
+            # Show all predictions
+            st.code(predictions)
+        else:
+            # Show a selection of the predictions
+            show_predictions = predictions[:max_display]
+            st.code(show_predictions)
+            st.write(
+                f"... and {len(predictions) - max_display} ",
+                "more.",
+            )
+
+    st.write("## Save Pipeline:")
     pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
     pipeline_version = st.text_input(
         "Give the version of the pipeline", "1.0.0"
@@ -186,4 +206,3 @@ if selected_model and selected_metrics and selected_features:
                 pipeline_artifact.save_metadata(artifact)
         automl._registry.register(pipeline_artifact)
         st.write(pipeline_artifact)
-    st.write("check")

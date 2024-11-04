@@ -173,7 +173,7 @@ class Model(ABC):
             Artifact: model as an artifact
         """
         model_data = {
-            "parameters": self._parameters,
+            "parameters": self.parameters,
             "features": self._n_features,
             "fitted": self._fitted,
             "model": self.__class__.__name__,
