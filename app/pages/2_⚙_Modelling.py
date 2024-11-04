@@ -131,18 +131,20 @@ if selected_model and selected_metrics and selected_features:
     if st.button("Execute pipeline"):
         result = pipeline.execute()
         st.write(result)
-        pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
-        pipeline_version = st.text_input(
-            "Give the version of the pipeline", "1.0.0"
-        )
-        if st.button("Save pipeline"):
-            all_artifacts = pipeline.artifacts
-            for artifact in all_artifacts:
-                if artifact.name == "pipeline_config":
-                    artifact.name = pipeline_name
-                    artifact.version = pipeline_version
-                    pipeline_artifact = artifact
-                else:
-                    pipeline_artifact.save_metadata(artifact)
-            st.write(pipeline_artifact)
+    pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
+    pipeline_version = st.text_input(
+        "Give the version of the pipeline", "1.0.0"
+    )
+    if st.button("Save pipeline"):
+        all_artifacts = pipeline.artifacts
+        for artifact in all_artifacts:
+            if artifact.name == "pipeline_config":
+                artifact.name = pipeline_name
+                artifact.version = pipeline_version
+                artifact.type = "pipeline"
+                pipeline_artifact = artifact
+            else:
+                pipeline_artifact.save_metadata(artifact)
+        automl._registry.register(pipeline_artifact)
+        st.write(pipeline_artifact)
     st.write("check")

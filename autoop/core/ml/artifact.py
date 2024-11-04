@@ -7,10 +7,10 @@ class Artifact:
     def __init__(
         self,
         name: str,
-        asset_path: str,
-        artifact_type: str,
         data: bytes,
-        version: str,
+        artifact_type: str = None,
+        asset_path: str = None,
+        version: str = None,
         tags: list = None,
         metadata: dict = None,
     ):
@@ -26,10 +26,10 @@ class Artifact:
             metadata (dict, optional): ids of metadata. Defaults to {}.
         """
         self.name = name
-        self.asset_path = asset_path
-        self.type = artifact_type
+        self.asset_path = asset_path if asset_path is not None else name
+        self.type = artifact_type if artifact_type is not None else "other"
         self.data = data
-        self.version = version
+        self.version = version if version is not None else "1.0.0"
         self.tags = tags if tags is not None else []
         self.metadata = metadata if metadata is not None else {}
         self.id = f"{self._base64_encode(self.asset_path)}-{self.version}"
@@ -38,7 +38,7 @@ class Artifact:
         """Save new metadata.
 
         Args:
-            name (str): name of metadata
+            artifact (Artifact): metadata to be saved
         """
         self.metadata.update({artifact.name: artifact.id})
 

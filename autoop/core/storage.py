@@ -71,7 +71,7 @@ class LocalStorage(Storage):
             base_path (str, optional): The location where to store the data.
                 Defaults to "./assets".
         """
-        self._base_path = base_path
+        self._base_path = os.path.normpath(base_path)
         if not os.path.exists(self._base_path):
             os.makedirs(self._base_path)
 
@@ -108,11 +108,11 @@ class LocalStorage(Storage):
         Args:
             key (str, optional): The name of the file. Defaults to "/".
         """
-        self._assert_path_exists(self._join_path(key))
         path = self._join_path(key)
+        self._assert_path_exists(path)
         os.remove(path)
 
-    def list(self, prefix: str) -> List[str]:
+    def list(self, prefix: str = "/") -> List[str]:
         """List all files in the given directory.
 
         Args:
@@ -123,8 +123,8 @@ class LocalStorage(Storage):
         """
         path = self._join_path(prefix)
         self._assert_path_exists(path)
-        keys = glob(path + "/**/*", recursive=True)
-        return list(filter(os.path.isfile, keys))
+        keys = glob(os.path.join(path, "**", "*"), recursive=True)
+        return [os.path.relpath(p, self._base_path) for p in keys if os.path.isfile(p)]
 
     def _assert_path_exists(self, path: str) -> None:
         """Check if the path exists.
@@ -147,4 +147,4 @@ class LocalStorage(Storage):
         Returns:
             str: The path towards the new file in the directory.
         """
-        return os.path.join(self._base_path, path)
+        return os.path.normpath(os.path.join(self._base_path, path))

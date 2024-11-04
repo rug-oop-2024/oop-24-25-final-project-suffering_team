@@ -1,4 +1,5 @@
 import json
+import os
 from typing import List, Optional, Tuple
 
 from autoop.core.storage import Storage
@@ -91,24 +92,22 @@ class Database:
                 continue
             for data_id, item in data.items():
                 self._storage.save(
-                    json.dumps(item).encode(), f"{collection}/{data_id}"
+                    json.dumps(item).encode(), f"{collection}{os.sep}{data_id}"
                 )
 
         # for things that were deleted, we need to remove them from the storage
         keys = self._storage.list("")
         for key in keys:
-            # Use \\ in split for windows and / for linux.
-            collection, data_id = key.split("\\")[-2:]
+            collection, data_id = key.split(os.sep)[-2:]
             if not self._data.get(collection, data_id):
-                self._storage.delete(f"{collection}/{data_id}")
+                self._storage.delete(f"{collection}{os.sep}{data_id}")
 
     def _load(self) -> None:
         """Load the data from storage."""
         self._data = {}
         for key in self._storage.list(""):
-            # Use \\ in split for windows and / for linux.
-            collection, data_id = key.split("\\")[-2:]
-            data = self._storage.load(f"{collection}/{data_id}")
+            collection, data_id = key.split(os.sep)[-2:]
+            data = self._storage.load(f"{collection}{os.sep}{data_id}")
             # Ensure the collection exists in the dictionary
             if collection not in self._data:
                 self._data[collection] = {}

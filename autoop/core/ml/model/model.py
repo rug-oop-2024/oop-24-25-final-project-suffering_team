@@ -177,4 +177,4 @@ class Model(ABC):
             "features": self._n_features,
             "fitted": self._fitted,
         }
-        return Artifact(name=name, data=pickle.dumps(model_data))
+        return Artifact(name=name, data=pickle.dumps(model_data), artifact_type="model")
