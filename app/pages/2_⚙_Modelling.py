@@ -184,7 +184,7 @@ if selected_model and selected_metrics and selected_features:
             st.write(
                 f"... and {len(predictions) - max_display} ",
                 "more.",
-            )   
+            )
 
     st.write("## Save Pipeline:")
     pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
