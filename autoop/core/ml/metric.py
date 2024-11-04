@@ -129,8 +129,9 @@ class MeanSquaredError(Metric):
         """
         self._check_dimensions(predictions, ground_truth)
 
-        total_squared_error = np.sum((ground_truth - predictions) ** 2)
-        return float(total_squared_error / len(predictions))
+        squared_errors = (ground_truth - predictions) ** 2
+        mean_squared_error = np.mean(squared_errors)
+        return float(mean_squared_error)
 
 
 class MeanAbsoluteError(Metric):
@@ -153,11 +154,9 @@ class MeanAbsoluteError(Metric):
         """
         self._check_dimensions(predictions, ground_truth)
 
-        total_absolute_error = 0
-        for index in range(len(predictions)):
-            value = abs(ground_truth[index] - predictions[index])
-            total_absolute_error += value
-        return float(total_absolute_error / len(predictions))
+        absolute_errors = np.abs(predictions - ground_truth)
+        mean_absolute_error = np.mean(absolute_errors)
+        return float(mean_absolute_error)
 
 
 class RSquared(Metric):

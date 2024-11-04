@@ -173,8 +173,10 @@ class Model(ABC):
             Artifact: model as an artifact
         """
         model_data = {
-            "parameters": self._parameters,
+            "parameters": self.parameters,
             "features": self._n_features,
             "fitted": self._fitted,
         }
-        return Artifact(name=name, data=pickle.dumps(model_data), artifact_type="model")
+        return Artifact(
+            name=name, data=pickle.dumps(model_data), artifact_type="model"
+        )
