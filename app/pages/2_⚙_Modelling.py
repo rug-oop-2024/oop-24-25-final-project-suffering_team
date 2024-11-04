@@ -148,8 +148,8 @@ if selected_model and selected_metrics and selected_features:
 
     # Not all predictions should be showed if there are many predictions
     max_display = st.number_input(
-        "Enter the maximum number of predictions to display.",
-        min_value=1,
+        "Enter the maximum number of predictions to display. (0=all))",
+        min_value=0,
         value=50,
         step=1,
     )
@@ -174,16 +174,17 @@ if selected_model and selected_metrics and selected_features:
             st.write(f"- **{metric_name}**: {metric_result[1]}")
 
         st.write("### Predictions:")
-        num_predictions = min(max_display, len(predictions))
-        show_predictions = predictions[:num_predictions]
-        st.code(show_predictions)
-
-        # Inform if there are more
-        if len(predictions) > num_predictions:
+        if max_display == 0 or max_display >= len(predictions):
+            # Show all predictions
+            st.code(predictions)
+        else:
+            # Show a selection of the predictions
+            show_predictions = predictions[:max_display]
+            st.code(show_predictions)
             st.write(
-                f"... There are {len(predictions) - num_predictions} ",
-                "more predictions.",
-            )
+                f"... and {len(predictions) - max_display} ",
+                "more.",
+            )   
 
     st.write("## Save Pipeline:")
     pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
