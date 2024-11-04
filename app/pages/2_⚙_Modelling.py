@@ -157,17 +157,13 @@ if selected_model and selected_metrics and selected_features:
 
         st.subheader("Train metrics:")
         for metric_result in train_result:
-            st.write(
-                f"- **{metric_result[0].__class__.__name__}**: ",
-                f"{metric_result[1]}",
-            )
+            metric_name = metric_result[0].__class__.__name__
+            st.write(f"- **{metric_name}**: {metric_result[1]}")
 
         st.subheader("Test metrics:")
         for metric_result in test_result:
-            st.write(
-                f"- **{metric_result[0].__class__.__name__}**: ",
-                f"{metric_result[1]}",
-            )
+            metric_name = metric_result[0].__class__.__name__
+            st.write(f"- **{metric_name}**: {metric_result[1]}")
 
         st.subheader("Predictions:")
         st.code(predictions)
