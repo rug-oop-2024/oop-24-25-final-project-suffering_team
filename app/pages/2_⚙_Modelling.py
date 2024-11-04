@@ -160,18 +160,21 @@ if selected_model and selected_metrics and selected_features:
         train_result = result["train_metrics"]
         test_result = result["test_metrics"]
         predictions = result["predictions"]
+        if target.type == "categorical":
+            unique_target_values = full_data[target.name].unique()
+            predictions = [unique_target_values[pred] for pred in predictions]
 
         st.write("## Pipeline Results:")
 
         st.write("### Train metrics:")
         for metric_result in train_result:
             metric_name = metric_result[0].__class__.__name__
-            st.write(f"- **{metric_name}**: {metric_result[1]}")
+            st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
 
         st.write("### Test metrics:")
         for metric_result in test_result:
             metric_name = metric_result[0].__class__.__name__
-            st.write(f"- **{metric_name}**: {metric_result[1]}")
+            st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
 
         st.write("### Predictions:")
         if max_display == 0 or max_display >= len(predictions):
