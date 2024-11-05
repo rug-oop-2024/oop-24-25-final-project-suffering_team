@@ -72,7 +72,6 @@ class ArtifactRegistry:
             artifact_id (str): id of artifact
         """
         data = self._database.get("artifacts", artifact_id)
-        st.write(data)
         return Artifact(
             name=data["name"],
             version=data["version"],

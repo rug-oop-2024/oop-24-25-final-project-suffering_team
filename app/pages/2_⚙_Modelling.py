@@ -30,6 +30,10 @@ def write_helper_text(text: str):
     st.write(f'<p style="color: #888;">{text}</p>', unsafe_allow_html=True)
 
 
+if "executed_pipeline" not in st.session_state:
+    st.session_state.result = None
+    st.session_state.executed_pipeline = None
+
 st.write("# ⚙ Modelling")
 write_helper_text(
     "In this section, you can design a "
@@ -155,42 +159,45 @@ if selected_model and selected_metrics and selected_features:
         step=1,
     )
     if st.button("Execute pipeline"):
-        result = pipeline.execute()
+        st.session_state.result = pipeline.execute()
+        st.session_state.executed_pipeline = pipeline
 
-        # Extract results
-        train_result = result["train_metrics"]
-        test_result = result["test_metrics"]
-        predictions = result["predictions"]
-        # Get the original labels
-        if target.type == "categorical":
-            unique_target_values = full_data[target.name].unique()
-            predictions = [unique_target_values[pred] for pred in predictions]
 
-        st.write("## Pipeline Results:")
+if st.session_state.executed_pipeline is not None:
+    result = st.session_state.result
+    # Extract results
+    train_result = result["train_metrics"]
+    test_result = result["test_metrics"]
+    predictions = result["predictions"]
+    # Get the original labels
+    if target.type == "categorical":
+        unique_target_values = full_data[target.name].unique()
+        predictions = [unique_target_values[pred] for pred in predictions]
 
-        st.write("### Train metrics:")
-        for metric_result in train_result:
-            metric_name = metric_result[0].__class__.__name__
-            st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
+    st.write("## Pipeline Results:")
 
-        st.write("### Test metrics:")
-        for metric_result in test_result:
-            metric_name = metric_result[0].__class__.__name__
-            st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
+    st.write("### Train metrics:")
+    for metric_result in train_result:
+        metric_name = metric_result[0].__class__.__name__
+        st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
 
-        st.write("### Predictions:")
-        if max_display == 0 or max_display >= len(predictions):
-            # Show all predictions
-            st.code(predictions)
-        else:
-            # Show a selection of the predictions
-            show_predictions = predictions[:max_display]
-            st.code(show_predictions)
-            st.write(
-                f"... and {len(predictions) - max_display} ",
-                "more.",
-            )
+    st.write("### Test metrics:")
+    for metric_result in test_result:
+        metric_name = metric_result[0].__class__.__name__
+        st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
 
+    st.write("### Predictions:")
+    if max_display == 0 or max_display >= len(predictions):
+        # Show all predictions
+        st.code(predictions)
+    else:
+        # Show a selection of the predictions
+        show_predictions = predictions[:max_display]
+        st.code(show_predictions)
+        st.write(
+            f"... and {len(predictions) - max_display} ",
+            "more.",
+        )
     # The pipeline needs to have a trained model before it can be saved.
     st.write("## Save Pipeline:")
     pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
@@ -198,6 +205,7 @@ if selected_model and selected_metrics and selected_features:
         "Give the version of the pipeline", "1.0.0"
     )
     if st.button("Save pipeline"):
+        pipeline = st.session_state.executed_pipeline
         all_artifacts = pipeline.artifacts
         for artifact in all_artifacts:
             if artifact.name == "pipeline_config":
@@ -212,6 +220,8 @@ if selected_model and selected_metrics and selected_features:
                 pipeline_artifact = artifact
             else:
                 automl._registry.register(artifact)
+        for artifact in all_artifacts:
+            if artifact.name != "pipeline_config":
                 pipeline_artifact.save_metadata(artifact)
         automl._registry.register(pipeline_artifact)
         st.write(pipeline_artifact)
