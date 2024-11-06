@@ -1,4 +1,5 @@
 import io
+from math import ceil
 
 from app.core.system import AutoMLSystem
 from autoop.core.ml.dataset import Dataset
@@ -17,6 +18,9 @@ from autoop.functional.feature import detect_feature_types
 
 import pandas as pd
 import streamlit as st
+
+# The lowest number of samples the user can select for training data.
+MIN_TRAINING_SAMPLES = 3
 
 st.set_page_config(page_title="Modelling", page_icon="📈")
 
@@ -124,8 +128,10 @@ if name is not None:
 
 
 if selected_model and selected_metrics and selected_features:
+    # There should be at least 2 training samples
+    min_split = ceil(MIN_TRAINING_SAMPLES / len(full_data) * 100) / 100
     split = st.slider(
-        "Select how much of the data is for training.", 0.01, 0.99, 0.80
+        "Select how much of the data is for training.", min_split, 0.99, 0.80
     )
     pipeline = Pipeline(
         metrics=metrics,
