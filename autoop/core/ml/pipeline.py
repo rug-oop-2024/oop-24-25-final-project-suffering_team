@@ -1,3 +1,4 @@
+import io
 import pickle
 from typing import List
 
@@ -6,9 +7,13 @@ from autoop.core.ml.dataset import Dataset
 from autoop.core.ml.feature import Feature
 from autoop.core.ml.metric import Metric
 from autoop.core.ml.model import Model
+from autoop.functional.feature import detect_feature_types
 from autoop.functional.preprocessing import preprocess_features
 
 import numpy as np
+import pandas as pd
+
+from exceptions import DatasetValidationError
 
 
 class Pipeline:
@@ -135,7 +140,7 @@ class Pipeline:
         input_results = preprocess_features(
             self._input_features, self._dataset
         )
-        for feature_name, data, artifact in input_results:
+        for feature_name, _data, artifact in input_results:
             self._register_artifact(feature_name, artifact)
         # Get the input vectors and output vector,
         # sort by feature name for consistency
@@ -207,3 +212,90 @@ class Pipeline:
             "test_metrics": self._metrics_results,
             "predictions": self._predictions,
         }
+
+    def _validate_prediction_features(self, new_dataset: Dataset) -> None:
+        """Validate that only trained features are in the dataset.
+
+        Args:
+            new_data (Dataset): The new dataset that is to be checked.
+
+        Raises:
+            DatasetValidationError: If necessary features are missing.
+            DatasetValidationError: If there are extra features.
+            DatasetValidationError: If the features are of a wrong type.
+        """
+        # Collect the feature names and types from the data set
+        new_features = {
+            feature.name: feature.type
+            for feature in detect_feature_types(new_dataset)
+        }
+
+        # Store the required feature names and types
+        required_features = [feature.name for feature in self._input_features]
+        required_types = {
+            feature.name: feature.type for feature in self._input_features
+        }
+
+        # Check if the required features are present in the new_features
+        missing_features = [
+            feature
+            for feature in required_features
+            if feature not in new_features
+        ]
+        if missing_features:
+            raise DatasetValidationError(missing_features=missing_features)
+
+        # Check if there are features which should not be present
+        extra_features = [
+            feature
+            for feature in new_features
+            if feature not in required_features
+        ]
+        if extra_features:
+            raise DatasetValidationError(extra_features=extra_features)
+
+        # Check if the present features have the correct type
+        incorrect_types = {
+            feature: (new_features[feature], expected_type)
+            for feature, expected_type in required_types.items()
+            if new_features[feature] != expected_type
+        }
+        if incorrect_types:
+            raise DatasetValidationError(incorrect_types=incorrect_types)
+
+    def _preprocess_prediction_columns(self, new_dataset: Dataset) -> None:
+        """Reorder the new columns so they are in the expected order.
+
+        Args:
+            new_data (Dataset): The dataset with columns that need sorting.
+        """
+        csv = new_dataset.data.decode()
+        full_data = pd.read_csv(io.StringIO(csv))
+        expected_column_order = [
+            feature.name for feature in self._input_features
+        ]
+        # Reorder the columns using the list of column names in the correct
+        new_data_reordered = full_data[expected_column_order]
+        new_dataset.data = new_data_reordered.to_csv(index=False).encode()
+        input_results = preprocess_features(self._input_features, new_dataset)
+        for feature_name, _data, artifact in input_results:
+            self._register_artifact(feature_name, artifact)
+        self._input_vectors = [
+            data for (feature_name, data, artifact) in input_results
+        ]
+
+    def make_predictions(self, new_dataset: Dataset) -> np.ndarray:
+        """Make predictions for new data.
+
+        Args:
+            new_data (Dataset):
+
+        Returns:
+            np.ndarray: The predictions for the new dataset.
+        """
+        # Make sure the right features are in the correct order
+        self._validate_prediction_features(new_dataset)
+        self._preprocess_prediction_columns(new_dataset)
+
+        observations = self._compact_vectors(self._input_vectors)
+        return self._model.predict(observations)

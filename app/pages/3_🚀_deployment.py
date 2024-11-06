@@ -3,17 +3,13 @@ import pickle
 
 from app.core.system import AutoMLSystem
 from autoop.core.ml.dataset import Dataset
-from autoop.core.ml.metric import (
-    CLASSIFICATION_METRICS,
-    REGRESSION_METRICS,
-    get_metric,
-)
 from autoop.core.ml.model import get_model
 from autoop.core.ml.pipeline import Pipeline
-from autoop.functional.feature import detect_feature_types
 
 import pandas as pd
 import streamlit as st
+
+from exceptions import DatasetValidationError
 
 automl = AutoMLSystem.get_instance()
 
@@ -57,11 +53,11 @@ if name is not None:
     target_feature = pipeline_data.get("target_feature")
     metrics = pipeline_data.get("metrics")
     split = pipeline_data.get("split")
-    dataset = pipeline_data.get("dataset")
+    old_dataset = pipeline_data.get("dataset")
 
     st.write("## Pipeline Summary:")
     st.write("The following pipeline has been created:")
-    st.write("- **Dataset**:", dataset.name)
+    st.write("- **Dataset**:", old_dataset.name)
     st.write("- **Target Feature**:", target_feature.name)
     st.write(
         "- **Input Features**:",
@@ -87,12 +83,20 @@ if name is not None:
             metric_name = metric_result[0].__class__.__name__
             st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
 
+    # Tell the user how to format the input columns
+    st.write("## Upload New Data")
+    st.write("The dataset should contain the following input columns:")
+    st.write(
+        f"- '{input_feature.name}' which is {input_feature.type},  \n"
+        for input_feature in input_features
+    )
+
+    # Load the data set the user chooses
     new_dataset = st.selectbox(
-        "Choose dataset to use on model or upload your own in datasets page:",
+        "Choose dataset to make predictions for:",
         (dataset.name for dataset in datasets),
         index=None,
     )
-
     if new_dataset is not None:
         for dataset in datasets:
             if dataset.name == new_dataset:
@@ -102,72 +106,22 @@ if name is not None:
         csv = data_bytes.decode()
         full_data = pd.read_csv(io.StringIO(csv))
         st.write("Chosen data:", full_data.head())
-        correct_dataset = Dataset.from_dataframe(
+        new_dataset = Dataset.from_dataframe(
             name=chosen_data.name,
             data=full_data,
             asset_path=chosen_data.asset_path,
             version=chosen_data.version,
         )
-        model_type = model.type
-        possible_features = detect_feature_types(correct_dataset)
-        if model_type == "regression":
-            correct_features = [
-                feature
-                for feature in possible_features
-                if feature.type == "numerical"
-            ]
-        else:
-            correct_features = [
-                feature
-                for feature in possible_features
-                if feature.type == "categorical"
-            ]
-        st.write("## Feature Selection:")
-        target = st.selectbox(
-            "Select target column for prediction:",
-            correct_features,
-            index=None,
+        loaded_pipeline = Pipeline(
+            metrics=[],
+            dataset=old_dataset,
+            model=model,
+            input_features=input_features,
+            target_feature=target_feature,
+            split=0,
         )
-        if target is not None:
-            input_features_options = [
-                feature
-                for feature in possible_features
-                if feature.name != target.name
-            ]
-            new_input_features = st.multiselect(
-                "Select input columns for model:", input_features_options
-            )
-            st.write(
-                "Chosen columns:",
-                ", ".join(feature.name for feature in input_features),
-            )
-            # As we only want to predict the split should be 0
-            new_split = 0
-            loaded_pipeline = Pipeline(
-                metrics=metrics,
-                dataset=correct_dataset,
-                model=model,
-                input_features=new_input_features,
-                target_feature=target,
-                split=new_split,
-            )
-            st.write(
-                "model:",
-                model.__class__.__name__,
-                "\n column to predict:",
-                target.name,
-                "\n column used to predict",
-                (feature.name for feature in input_features),
-                "\n evaluating with:",
-                (metric.__class__.__name__ for metric in metrics),
-            )
-            if st.button("Predict"):
-                loaded_pipeline._preprocess_features()
-                loaded_pipeline._split_data()
-                loaded_pipeline._evaluate()
-                st.write(
-                    "metrics:",
-                    loaded_pipeline._metrics_results,
-                    "predictions:",
-                    loaded_pipeline._predictions,
-                )
+        if st.button("Predict"):
+            try:
+                predictions = loaded_pipeline.make_predictions(new_dataset)
+            except DatasetValidationError as e:
+                st.write(str(e))
