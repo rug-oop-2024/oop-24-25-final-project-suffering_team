@@ -3,7 +3,7 @@ import pickle
 
 from app.core.system import AutoMLSystem
 from autoop.core.ml.dataset import Dataset
-from autoop.core.ml.model import get_model
+from autoop.core.ml.model.model import Model
 from autoop.core.ml.pipeline import Pipeline
 
 import pandas as pd
@@ -40,14 +40,10 @@ if name is not None:
             model_id = pipeline_setup.metadata[key]
             break
     model_setup = automl.registry.get(model_id)
-    model_data = pickle.loads(model_setup.data)
-    model = get_model(model_data["model"])
-    model._parameters = model_data["parameters"]
-    model._n_features = model_data["features"]
-    model._fitted = model_data["fitted"]
+    recreated_model = Model.from_artifact(model_setup)
 
     pipeline_setup.data = pipeline_data
-    pipeline_setup.metadata[key] = model
+    pipeline_setup.metadata[key] = recreated_model
 
     input_features = pipeline_data.get("input_features")
     target_feature = pipeline_data.get("target_feature")
@@ -63,7 +59,7 @@ if name is not None:
         "- **Input Features**:",
         ", ".join(feature.name for feature in input_features),
     )
-    st.write("- **Model**:", model.__class__.__name__)
+    st.write("- **Model**:", recreated_model.__class__.__name__)
     st.write(
         "- **Metrics**:",
         ", ".join(metric.__class__.__name__ for metric in metrics),
@@ -102,9 +98,11 @@ if name is not None:
             if dataset.name == new_dataset:
                 chosen_data = dataset
                 break
+        # Decode the new data set
         data_bytes = chosen_data.data
         csv = data_bytes.decode()
         full_data = pd.read_csv(io.StringIO(csv))
+
         st.write("Chosen data:", full_data.head())
         new_dataset = Dataset.from_dataframe(
             name=chosen_data.name,
@@ -115,7 +113,7 @@ if name is not None:
         loaded_pipeline = Pipeline(
             metrics=[],
             dataset=old_dataset,
-            model=model,
+            model=recreated_model,
             input_features=input_features,
             target_feature=target_feature,
             split=0,
@@ -123,5 +121,17 @@ if name is not None:
         if st.button("Predict"):
             try:
                 predictions = loaded_pipeline.make_predictions(new_dataset)
+                if recreated_model.type == "classification":
+                    # Decode the old data set to find the unique labels
+                    data_bytes = old_dataset.data
+                    csv = data_bytes.decode()
+                    old_data = pd.read_csv(io.StringIO(csv))
+                    unique_target_values = old_data[
+                        target_feature.name
+                    ].unique()
+                    predictions = [
+                        unique_target_values[pred] for pred in predictions
+                    ]
+                st.write(predictions)
             except DatasetValidationError as e:
                 st.write(str(e))

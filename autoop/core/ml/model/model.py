@@ -17,6 +17,7 @@ class Model(ABC):
         self._type = None  # Set type in subclass models
         self._n_features = None
         self._fitted = False
+        self._model = None
 
     @property
     def parameters(self) -> dict[str, np.ndarray]:
@@ -176,8 +177,44 @@ class Model(ABC):
             "parameters": self.parameters,
             "features": self._n_features,
             "fitted": self._fitted,
-            "model": self.__class__.__name__,
+            "model_name": self.__class__.__name__,
+            "model_type": self.type,
         }
+        # Check if an external model is used.
+        if self._model:
+            model_data.update(
+                {
+                    "model_instance": pickle.dumps(self._model),
+                }
+            )
+
         return Artifact(
             name=name, data=pickle.dumps(model_data), artifact_type="model"
         )
+
+    @classmethod
+    def from_artifact(cls, artifact: "Artifact") -> "Model":
+        """Recreate a model from an artifact.
+
+        Args:
+            artifact (Artifact): The artifact containing the model data.
+
+        Returns:
+            Model: An instance of the model with the state restored.
+        """
+        from autoop.core.ml.model import get_model
+
+        model_data = pickle.loads(artifact.data)
+        model_name = model_data["model_name"]
+        recreated_model = get_model(model_name)
+
+        recreated_model.parameters = model_data["parameters"]
+        recreated_model._n_features = model_data["features"]
+        recreated_model._fitted = model_data["fitted"]
+        recreated_model.type = model_data["model_type"]
+
+        # Check if an external model is stored.
+        if "model_instance" in model_data:
+            recreated_model._model = pickle.loads(model_data["model_instance"])
+
+        return recreated_model

@@ -67,11 +67,17 @@ if name is not None:
             break
     data_bytes = chosen_data.data
     csv = data_bytes.decode()
-    full_data = pd.read_csv(io.StringIO(csv))
-    st.write("Chosen data:", full_data.head())
+    csv_data = pd.read_csv(io.StringIO(csv))
+    st.write("Chosen data:", csv_data.head())
+
+    # Shuffle the data before training
+    shuffled_data = csv_data.sample(n=len(csv_data))
+    # Reassigns the indices
+    shuffled_data = shuffled_data.reset_index(drop=True)
+
     correct_dataset = Dataset.from_dataframe(
         name=chosen_data.name,
-        data=full_data,
+        data=shuffled_data,
         asset_path=chosen_data.asset_path,
         version=chosen_data.version,
     )
@@ -129,7 +135,7 @@ if name is not None:
 
 if selected_model and selected_metrics and selected_features:
     # There should be at least 2 training samples
-    min_split = ceil(MIN_TRAINING_SAMPLES / len(full_data) * 100) / 100
+    min_split = ceil(MIN_TRAINING_SAMPLES / len(shuffled_data) * 100) / 100
     split = st.slider(
         "Select how much of the data is for training.", min_split, 0.99, 0.80
     )
@@ -177,7 +183,7 @@ if st.session_state.executed_pipeline is not None:
     predictions = result["predictions"]
     # Get the original labels
     if target.type == "categorical":
-        unique_target_values = full_data[target.name].unique()
+        unique_target_values = shuffled_data[target.name].unique()
         predictions = [unique_target_values[pred] for pred in predictions]
 
     st.write("## Pipeline Results:")

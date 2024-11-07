@@ -1,12 +1,15 @@
 import io
 import pickle
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from autoop.core.ml.artifact import Artifact
 from autoop.core.ml.dataset import Dataset
 from autoop.core.ml.feature import Feature
 from autoop.core.ml.metric import Metric
-from autoop.core.ml.model import Model
+
+if TYPE_CHECKING:
+    from autoop.core.ml.model import Model
+
 from autoop.functional.feature import detect_feature_types
 from autoop.functional.preprocessing import preprocess_features
 
@@ -23,7 +26,7 @@ class Pipeline:
         self,
         metrics: List[Metric],
         dataset: Dataset,
-        model: Model,
+        model: "Model",
         input_features: List[Feature],
         target_feature: Feature,
         split=0.8,
@@ -79,7 +82,7 @@ class Pipeline:
         """
 
     @property
-    def model(self) -> Model:
+    def model(self) -> "Model":
         """Return the model used by the current Pipeline."""
         return self._model
 
@@ -117,7 +120,7 @@ class Pipeline:
             Artifact(name="pipeline_config", data=pickle.dumps(pipeline_data))
         )
         artifacts.append(
-            self._model.to_artifact(name=f"pipeline_model_{self._model.type}")
+            self.model.to_artifact(name=f"pipeline_model_{self.model.type}")
         )
         return artifacts
 
