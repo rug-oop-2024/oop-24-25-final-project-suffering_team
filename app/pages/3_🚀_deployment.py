@@ -40,6 +40,7 @@ if name is not None:
         for artifact_id in pipeline_to_delete.metadata.values():
             automl.registry.delete(artifact_id)
         automl.registry.delete(pipeline.id)
+        st.rerun()
 
     # Load the pipeline data
     for pipeline in pipelines:

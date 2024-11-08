@@ -67,6 +67,7 @@ if name is not None:
         for dataset in datasets:
             if dataset.name == name:
                 automl.registry.delete(dataset.id)
+                st.rerun()
 
     for dataset in datasets:
         if dataset.name == name:
