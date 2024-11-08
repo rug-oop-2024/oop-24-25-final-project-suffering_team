@@ -208,7 +208,8 @@ class Pipeline:
             result = metric.evaluate(predictions, ground_truth)
             self._metrics_results.append((metric, result))
         encoder = list(self._artifacts[self._target_feature.name].values())[1]
-        predictions = encoder.inverse_transform(predictions)
+        if encoder.__class__.__name__ == "StandardScaler":
+            predictions = encoder.inverse_transform(predictions)
         self._predictions = predictions
 
     def execute(self) -> dict[str, list]:
@@ -314,4 +315,10 @@ class Pipeline:
 
         observations = self._compact_vectors(self._input_vectors)
         encoder = self._artifacts[self._target_feature.name]
-        return encoder.inverse_transform(self._model.predict(observations))
+        if encoder.__class__.__name__ == "StandardScaler":
+            predictions = encoder.inverse_transform(
+                self._model.predict(observations)
+            )
+        else:
+            predictions = self._model.predict(observations)
+        return predictions
