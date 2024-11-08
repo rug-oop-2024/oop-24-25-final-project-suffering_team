@@ -241,7 +241,7 @@ if selected_model and selected_metrics and selected_features:
                 else:
                     automl._registry.register(artifact)
             for artifact in all_artifacts:
-                if artifact.type != "pipeline_config":
+                if artifact.type != "pipeline":
                     pipeline_artifact.save_metadata(artifact)
             automl._registry.register(pipeline_artifact)
             st.success(
