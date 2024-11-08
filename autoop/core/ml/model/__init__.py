@@ -1,3 +1,12 @@
+"""Public package to get correct model.
+
+Raises:
+    ValueError: error if name isn't a model
+
+Returns:
+    Model: returns a model that corresponds with the name
+"""
+
 from typing import TYPE_CHECKING
 
 from autoop.core.ml.model.classification.k_nearest_neighbors import (

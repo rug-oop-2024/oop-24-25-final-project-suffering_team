@@ -1,14 +1,14 @@
 import io
 
-import pandas as pd
-
 from autoop.core.ml.artifact import Artifact
+
+import pandas as pd
 
 
 class Dataset(Artifact):
     """A class for datasets."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initialize the dataset."""
         super().__init__(artifact_type="dataset", *args, **kwargs)
 

@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestClassifier as SkRandomForestClassifier
 class RandomForestClassifier(Model):
     """A RandomForestClassifier implementation of the Model class."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initialize the LinearSVC model with the provided parameters.
 
         Args:

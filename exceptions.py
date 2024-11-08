@@ -7,7 +7,7 @@ class DatasetValidationError(Exception):
         missing_features: list[str] = None,
         incorrect_types: dict[str, tuple[str, str]] = None,
         extra_features: list[str] = None,
-    ):
+    ) -> None:
         """Initialize the error message.
 
         Args:

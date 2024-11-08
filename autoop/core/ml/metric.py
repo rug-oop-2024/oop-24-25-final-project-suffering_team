@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from autoop.core.ml.artifact import Artifact
-
 import numpy as np
 
 REGRESSION_METRICS = [
@@ -28,7 +26,8 @@ def get_metric(name: str) -> "Metric":
     all_metrics = REGRESSION_METRICS + CLASSIFICATION_METRICS
     if name not in all_metrics:
         raise ValueError(
-            f"'{name}' is not a valid metric name. Use one of the following:\n"
+            f"'{name}' is not a valid metric name."
+            + "Use one of the following:\n"
             + "\n".join(REGRESSION_METRICS)
             + "\n".join(CLASSIFICATION_METRICS)
         )

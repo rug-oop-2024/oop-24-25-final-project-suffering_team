@@ -13,7 +13,7 @@ class Artifact:
         version: str = None,
         tags: list = None,
         metadata: dict = None,
-    ):
+    ) -> None:
         """Initialize artifact.
 
         Args:
@@ -34,7 +34,7 @@ class Artifact:
         self.metadata = metadata if metadata is not None else {}
         self.id = f"{self._base64_encode(self.asset_path)}-{self.version}"
 
-    def save_metadata(self, artifact: "Artifact"):
+    def save_metadata(self, artifact: "Artifact") -> None:
         """Save new metadata.
 
         Args:
@@ -62,11 +62,11 @@ class Artifact:
         """
         return self.data
 
-    def save(self, new_data) -> None:
+    def save(self, new_data: bytes) -> None:
         """Save the data in the artifact.
 
         Args:
-            new_data (_type_): The data that is to be saved in the artifact.
+            new_data (bytes): The data that is to be saved in the artifact.
 
         Returns:
             returns the data that was given.

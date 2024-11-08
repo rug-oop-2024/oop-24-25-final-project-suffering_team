@@ -8,7 +8,7 @@ from autoop.core.storage import Storage
 class Database:
     """A class for database."""
 
-    def __init__(self, storage: Storage):
+    def __init__(self, storage: Storage) -> None:
         """Initialize the database.
 
         Args:
@@ -31,7 +31,7 @@ class Database:
         assert isinstance(entry, dict), "Data must be a dictionary"
         assert isinstance(collection, str), "Collection must be a string"
         assert isinstance(data_id, str), "ID must be a string"
-        if not self._data.get(collection, None):
+        if not self._data.get(collection):
             self._data[collection] = {}
         self._data[collection][data_id] = entry
         self._persist()
@@ -47,9 +47,9 @@ class Database:
             Optional[dict]: The data that was stored,
                 or None if it doesn't exist
         """
-        if not self._data.get(collection, None):
+        if not self._data.get(collection):
             return None
-        return self._data[collection].get(data_id, None)
+        return self._data[collection].get(data_id)
 
     def delete(self, collection: str, data_id: str) -> None:
         """Delete a key from the database.
@@ -60,9 +60,9 @@ class Database:
         Returns:
             None
         """
-        if not self._data.get(collection, None):
+        if not self._data.get(collection):
             return
-        if self._data[collection].get(data_id, None):
+        if self._data[collection].get(data_id):
             del self._data[collection][data_id]
         self._persist()
 
@@ -75,7 +75,7 @@ class Database:
             List[Tuple[str, dict]]: A list of tuples containing the id and
                 data for each item in the collection
         """
-        if not self._data.get(collection, None):
+        if not self._data.get(collection):
             return []
         return [
             (data_id, data) for data_id, data in self._data[collection].items()

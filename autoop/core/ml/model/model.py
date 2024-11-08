@@ -11,7 +11,7 @@ import numpy as np
 class Model(ABC):
     """Use as an abstract base class for different ML models."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize model base class."""
         self._parameters = {}
         self._type = None  # Set type in subclass models

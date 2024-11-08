@@ -4,13 +4,11 @@ from autoop.core.database import Database
 from autoop.core.ml.artifact import Artifact
 from autoop.core.storage import LocalStorage, Storage
 
-import streamlit as st
-
 
 class ArtifactRegistry:
     """Class to register artifacts."""
 
-    def __init__(self, database: Database, storage: Storage):
+    def __init__(self, database: Database, storage: Storage) -> None:
         """Initialize registry.
 
         Args:
@@ -20,7 +18,7 @@ class ArtifactRegistry:
         self._database = database
         self._storage = storage
 
-    def register(self, artifact: Artifact):
+    def register(self, artifact: Artifact) -> None:
         """Register the artifact.
 
         Args:
@@ -37,10 +35,10 @@ class ArtifactRegistry:
             "metadata": artifact.metadata,
             "type": artifact.type,
         }
-        self._database.set_data(f"artifacts", artifact.id, entry)
+        self._database.set_data("artifacts", artifact.id, entry)
 
     def list(self, type: str = None) -> List[Artifact]:
-        """Get artrifacts in the registry
+        """Get artrifacts in the registry.
 
         Args:
             type (str, optional): type of artifact you need. Defaults to None.
@@ -82,7 +80,7 @@ class ArtifactRegistry:
             artifact_type=data["type"],
         )
 
-    def delete(self, artifact_id: str):
+    def delete(self, artifact_id: str) -> None:
         """Delete artifact from registry.
 
         Args:
@@ -98,7 +96,7 @@ class AutoMLSystem:
 
     _instance = None
 
-    def __init__(self, storage: LocalStorage, database: Database):
+    def __init__(self, storage: LocalStorage, database: Database) -> None:
         """Initialize system.
 
         Args:
@@ -110,7 +108,7 @@ class AutoMLSystem:
         self._registry = ArtifactRegistry(database, storage)
 
     @staticmethod
-    def get_instance():
+    def get_instance() -> "AutoMLSystem":
         """Get an instance of this class.
 
         Returns:
@@ -125,7 +123,7 @@ class AutoMLSystem:
         return AutoMLSystem._instance
 
     @property
-    def registry(self):
+    def registry(self) -> "ArtifactRegistry":
         """Get artifact registry.
 
         Returns:

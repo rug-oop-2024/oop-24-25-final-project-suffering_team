@@ -7,7 +7,7 @@ from sklearn.linear_model import LinearRegression as SkLinearRegression
 class MultipleLinearRegression(Model):
     """A MultipleLinearRegression implementation of the model class."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initialize the MultipleLinearRegression model."""
         super().__init__()
         self._model = SkLinearRegression(*args, **kwargs)

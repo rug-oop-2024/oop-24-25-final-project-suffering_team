@@ -1,7 +1,7 @@
 class Feature:
     """Represent a categorical or numerical column in a csv."""
 
-    def __init__(self, name: str, column_type: str):
+    def __init__(self, name: str, column_type: str) -> None:
         """Initialize the feature.
 
         Args:

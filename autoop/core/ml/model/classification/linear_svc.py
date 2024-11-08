@@ -7,7 +7,7 @@ from sklearn.svm import LinearSVC as SkLinearSVC
 class LinearSVC(Model):
     """A LinearSVC implementation of the Model class."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initialize the LinearSVC model with the provided parameters.
 
         Args:

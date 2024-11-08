@@ -1,5 +1,3 @@
-from autoop.core.ml.artifact import Artifact
-
 import streamlit as st
 
 if "executed_pipeline" in st.session_state:

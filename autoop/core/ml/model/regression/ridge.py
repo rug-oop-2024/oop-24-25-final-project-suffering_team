@@ -7,7 +7,7 @@ from sklearn.linear_model import Ridge as SkRidge
 class Ridge(Model):
     """A Ridge implementation of the Model class."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initialize the Ridge model with the provided parameters.
 
         Args:

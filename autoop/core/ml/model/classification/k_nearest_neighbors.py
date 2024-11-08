@@ -7,7 +7,7 @@ from sklearn.neighbors import KNeighborsClassifier as SkKNeighborsClassifier
 class KNearestNeighbors(Model):
     """A KNearestNeighbors implementation of the Model class."""
 
-    def __init__(self, *args, k_value: int = 3, **kwargs):
+    def __init__(self, *args, k_value: int = 3, **kwargs) -> None:
         """Initialize model.
 
         Args:
