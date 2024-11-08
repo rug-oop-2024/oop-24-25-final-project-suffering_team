@@ -172,7 +172,16 @@ class Pipeline:
         ]
 
     def _compact_vectors(self, vectors: List[np.array]) -> np.array:
-        """Combine a list of vectors into one array."""
+        """Combine a list of vectors into one array.
+
+        Args:
+            vectors (List[np.array]): The list of vectors which need
+                to be combined.
+
+        Returns:
+            np.array: The combined vectors in one array.
+        """
+
         return np.concatenate(vectors, axis=1)
 
     def _train(self) -> None:
