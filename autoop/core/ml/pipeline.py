@@ -15,6 +15,7 @@ from autoop.functional.preprocessing import preprocess_features
 
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from exceptions import DatasetValidationError
 
@@ -57,8 +58,8 @@ class Pipeline:
         self._artifacts = {}
         self._split = split
         if (
-            target_feature.type == "categorical" and
-            model.type != "classification"
+            target_feature.type == "categorical"
+            and model.type != "classification"
         ):
             raise ValueError(
                 "Model type must be classification",
@@ -156,18 +157,18 @@ class Pipeline:
         """Split the data into training and testing sets."""
         split = self._split
         self._train_X = [
-            vector[:int(split * len(vector))]
+            vector[: int(split * len(vector))]
             for vector in self._input_vectors
         ]
         self._test_X = [
-            vector[int(split * len(vector)):]
+            vector[int(split * len(vector)) :]
             for vector in self._input_vectors
         ]
         self._train_y = self._output_vector[
-            :int(split * len(self._output_vector))
+            : int(split * len(self._output_vector))
         ]
         self._test_y = self._output_vector[
-            int(split * len(self._output_vector)):
+            int(split * len(self._output_vector)) :
         ]
 
     def _compact_vectors(self, vectors: List[np.array]) -> np.array:
@@ -197,6 +198,8 @@ class Pipeline:
         for metric in self._metrics:
             result = metric.evaluate(predictions, ground_truth)
             self._metrics_results.append((metric, result))
+        encoder = list(self._artifacts[self._target_feature.name].values())[1]
+        predictions = encoder.inverse_transform(predictions)
         self._predictions = predictions
 
     def execute(self) -> dict[str, list]:
@@ -301,4 +304,5 @@ class Pipeline:
         self._preprocess_prediction_columns(new_dataset)
 
         observations = self._compact_vectors(self._input_vectors)
-        return self._model.predict(observations)
+        encoder = list(self._artifacts[self._target_feature.name].values())[1]
+        return encoder.inverse_transform(self._model.predict(observations))

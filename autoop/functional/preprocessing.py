@@ -30,7 +30,7 @@ def preprocess_features(
             ).toarray()
             aritfact = {
                 "type": "OneHotEncoder",
-                "encoder": encoder.get_params(),
+                "encoder": encoder,
             }
             results.append((feature.name, data, aritfact))
         if feature.type == "numerical":
@@ -40,7 +40,7 @@ def preprocess_features(
             )
             artifact = {
                 "type": "StandardScaler",
-                "scaler": scaler.get_params(),
+                "scaler": scaler,
             }
             results.append((feature.name, data, artifact))
     # Sort for consistency
