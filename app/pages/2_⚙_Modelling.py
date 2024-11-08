@@ -78,14 +78,9 @@ if name is not None:
     csv_data = pd.read_csv(io.StringIO(csv))
     st.write("Chosen data:", csv_data.head())
 
-    # Shuffle the data before training
-    shuffled_data = csv_data.sample(n=len(csv_data))
-    # Reassigns the indices
-    shuffled_data = shuffled_data.reset_index(drop=True)
-
     correct_dataset = Dataset.from_dataframe(
         name=chosen_data.name,
-        data=shuffled_data,
+        data=csv_data,
         asset_path=chosen_data.asset_path,
         version=chosen_data.version,
     )
@@ -142,8 +137,8 @@ if name is not None:
 
 
 if selected_model and selected_metrics and selected_features:
-    # There should be at least 2 training samples
-    min_split = ceil(MIN_TRAINING_SAMPLES / len(shuffled_data) * 100) / 100
+    # There should be at least some training samples
+    min_split = ceil(MIN_TRAINING_SAMPLES / len(csv_data) * 100) / 100
     split = st.slider(
         "Select how much of the data is for training.", min_split, 0.99, 0.80
     )
@@ -190,7 +185,7 @@ if selected_model and selected_metrics and selected_features:
         predictions = result["predictions"]
         # Get the original labels
         if target.type == "categorical":
-            unique_target_values = shuffled_data[target.name].unique()
+            unique_target_values = csv_data[target.name].unique()
             predictions = [unique_target_values[pred] for pred in predictions]
 
         st.write("## Pipeline Results:")
@@ -246,7 +241,9 @@ if selected_model and selected_metrics and selected_features:
                 else:
                     automl._registry.register(artifact)
             for artifact in all_artifacts:
-                if artifact.type != "pipeline":
+                if artifact.type != "pipeline_config":
                     pipeline_artifact.save_metadata(artifact)
             automl._registry.register(pipeline_artifact)
-            st.write(pipeline_artifact)
+            st.success(
+                f"Pipeline '{pipeline_name}' has been saved successfully!"
+            )
