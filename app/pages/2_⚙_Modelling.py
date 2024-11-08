@@ -61,6 +61,13 @@ name = st.selectbox(
 )
 
 if name is not None:
+    # This needs fixing as the storage deletes only the objects.
+    st.write("## Delete dataset")
+    if st.button("Delete dataset"):
+        for dataset in datasets:
+            if dataset.name == name:
+                automl.registry.delete(dataset.id)
+
     for dataset in datasets:
         if dataset.name == name:
             chosen_data = dataset
@@ -174,66 +181,71 @@ if selected_model and selected_metrics and selected_features:
         st.session_state.result = pipeline.execute()
         st.session_state.executed_pipeline = pipeline
 
+    if st.session_state.executed_pipeline is not None:
+        result = st.session_state.result
+        # Extract results
+        train_result = result["train_metrics"]
+        test_result = result["test_metrics"]
+        predictions = result["predictions"]
+        # Get the original labels
+        if target.type == "categorical":
+            unique_target_values = shuffled_data[target.name].unique()
+            predictions = [unique_target_values[pred] for pred in predictions]
 
-if st.session_state.executed_pipeline is not None:
-    result = st.session_state.result
-    # Extract results
-    train_result = result["train_metrics"]
-    test_result = result["test_metrics"]
-    predictions = result["predictions"]
-    # Get the original labels
-    if target.type == "categorical":
-        unique_target_values = shuffled_data[target.name].unique()
-        predictions = [unique_target_values[pred] for pred in predictions]
+        st.write("## Pipeline Results:")
 
-    st.write("## Pipeline Results:")
+        st.write("### Train metrics:")
+        for metric_result in train_result:
+            metric_name = metric_result[0].__class__.__name__
+            st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
 
-    st.write("### Train metrics:")
-    for metric_result in train_result:
-        metric_name = metric_result[0].__class__.__name__
-        st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
+        st.write("### Test metrics:")
+        for metric_result in test_result:
+            metric_name = metric_result[0].__class__.__name__
+            st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
 
-    st.write("### Test metrics:")
-    for metric_result in test_result:
-        metric_name = metric_result[0].__class__.__name__
-        st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
-
-    st.write("### Predictions:")
-    if max_display == 0 or max_display >= len(predictions):
-        # Show all predictions
-        st.code(predictions)
-    else:
-        # Show a selection of the predictions
-        show_predictions = predictions[:max_display]
-        st.code(show_predictions)
-        st.write(
-            f"... and {len(predictions) - max_display} ",
-            "more.",
+        st.write("### Predictions:")
+        if max_display == 0 or max_display >= len(predictions):
+            # Show all predictions
+            st.code(predictions)
+        else:
+            # Show a selection of the predictions
+            show_predictions = predictions[:max_display]
+            st.code(show_predictions)
+            st.write(
+                f"... and {len(predictions) - max_display} ",
+                "more.",
+            )
+        # The pipeline needs to have a trained model before it can be saved.
+        st.write("## Save Pipeline:")
+        pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
+        pipeline_version = st.text_input(
+            "Give the version of the pipeline", "1.0.0"
         )
-    # The pipeline needs to have a trained model before it can be saved.
-    st.write("## Save Pipeline:")
-    pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
-    pipeline_version = st.text_input(
-        "Give the version of the pipeline", "1.0.0"
-    )
-    if st.button("Save pipeline"):
-        pipeline = st.session_state.executed_pipeline
-        all_artifacts = pipeline.artifacts
-        for artifact in all_artifacts:
-            if artifact.name == "pipeline_config":
-                artifact.name = pipeline_name
-                artifact.asset_path = pipeline_name
-                artifact.version = pipeline_version
-                artifact.type = "pipeline"
+        if st.button("Save pipeline"):
+            pipeline = st.session_state.executed_pipeline
+            all_artifacts = pipeline.artifacts
+            for artifact in all_artifacts:
+                if artifact.name == "pipeline_config":
+                    artifact.name = pipeline_name
+                    artifact.asset_path = pipeline_name
+                    artifact.version = pipeline_version
+                    artifact.type = "pipeline"
 
-                encoded_path = artifact._base64_encode(artifact.asset_path)
-                artifact.id = f"{encoded_path}-{artifact.version}"
+                    encoded_path = artifact._base64_encode(artifact.asset_path)
+                    artifact.id = f"{encoded_path}-{artifact.version}"
 
-                pipeline_artifact = artifact
-            else:
-                automl._registry.register(artifact)
-        for artifact in all_artifacts:
-            if artifact.name != "pipeline_config":
-                pipeline_artifact.save_metadata(artifact)
-        automl._registry.register(pipeline_artifact)
-        st.write(pipeline_artifact)
+                    pipeline_artifact = artifact
+                elif artifact.type == "model":
+                    artifact.version = pipeline_version
+                    artifact.asset_path = f"{pipeline_name}-{artifact.name}"
+                    encoded_path = artifact._base64_encode(artifact.asset_path)
+                    artifact.id = f"{encoded_path}-{artifact.version}"
+                    automl._registry.register(artifact)
+                else:
+                    automl._registry.register(artifact)
+            for artifact in all_artifacts:
+                if artifact.type != "pipeline":
+                    pipeline_artifact.save_metadata(artifact)
+            automl._registry.register(pipeline_artifact)
+            st.write(pipeline_artifact)

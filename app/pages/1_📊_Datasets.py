@@ -4,6 +4,10 @@ from autoop.core.ml.dataset import Dataset
 import pandas as pd
 import streamlit as st
 
+if "executed_pipeline" in st.session_state:
+    st.session_state.result = None
+    st.session_state.executed_pipeline = None
+
 automl = AutoMLSystem.get_instance()
 
 st.set_page_config(page_title="Datasets", page_icon="📊")
