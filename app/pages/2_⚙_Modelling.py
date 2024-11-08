@@ -40,8 +40,8 @@ if "executed_pipeline" not in st.session_state:
 
 st.write("# ⚙ Modelling")
 write_helper_text(
-    "In this section, you can design a " +
-    "machine learning pipeline to train a model on a dataset."
+    "In this section, you can design a "
+    + "machine learning pipeline to train a model on a dataset."
 )
 
 automl = AutoMLSystem.get_instance()
@@ -184,9 +184,6 @@ if selected_model and selected_metrics and selected_features:
         test_result = result["test_metrics"]
         predictions = result["predictions"]
         # Get the original labels
-        if target.type == "categorical":
-            unique_target_values = csv_data[target.name].unique()
-            predictions = [unique_target_values[pred] for pred in predictions]
 
         st.write("## Pipeline Results:")
 
@@ -201,17 +198,33 @@ if selected_model and selected_metrics and selected_features:
             st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
 
         st.write("### Predictions:")
+        result_dataframe = pd.DataFrame(predictions, columns=[target.name])
+        if feature_type == "numerical":
+            # Limit the number of decimals in the predictions.
+            result_dataframe[target.name] = result_dataframe[target.name].map(
+                "{:,.4f}".format
+            )
+
         if max_display == 0 or max_display >= len(predictions):
             # Show all predictions
-            st.code(predictions)
+            st.write(result_dataframe)
         else:
             # Show a selection of the predictions
-            show_predictions = predictions[:max_display]
-            st.code(show_predictions)
+            st.write(result_dataframe.head(max_display))
             st.write(
                 f"... and {len(predictions) - max_display} ",
                 "more.",
             )
+
+        # Allow the user to download all predictions
+        csv_data = result_dataframe.to_csv()
+        st.download_button(
+            label="Download Predictions as csv.",
+            data=csv_data,
+            file_name="predictions.csv",
+            mime="text/csv",
+        )
+
         # The pipeline needs to have a trained model before it can be saved.
         st.write("## Save Pipeline:")
         pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")

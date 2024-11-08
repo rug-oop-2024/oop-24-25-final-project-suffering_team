@@ -11,10 +11,6 @@ import streamlit as st
 
 from exceptions import DatasetValidationError
 
-if "executed_pipeline" in st.session_state:
-    st.session_state.result = None
-    st.session_state.executed_pipeline = None
-
 automl = AutoMLSystem.get_instance()
 
 st.set_page_config(page_title="Deployment", page_icon="🚀")
@@ -31,7 +27,7 @@ name = st.selectbox(
 
 if name is not None:
     # This needs fixing as the storage deletes only the objects.
-    st.write("## Delete pipeline")
+    st.write("## Delete pipeline:")
     if st.button("Delete pipeline"):
         for pipeline in pipelines:
             if pipeline.name == name:
@@ -99,7 +95,7 @@ if name is not None:
             st.write(f"- **{metric_name}**: {metric_result[1]:.4f}")
 
     # Tell the user how to format the input columns
-    st.write("## Upload New Data")
+    st.write("## Upload New Data:")
     st.write("The dataset should contain the following input columns:")
     st.write(
         f"- '{input_feature.name}' which is {input_feature.type},  \n"
@@ -141,17 +137,26 @@ if name is not None:
         if st.button("Predict"):
             try:
                 predictions = loaded_pipeline.make_predictions(new_dataset)
-                if recreated_model.type == "classification":
-                    # Decode the old data set to find the unique labels
-                    data_bytes = old_dataset.data
-                    csv = data_bytes.decode()
-                    old_data = pd.read_csv(io.StringIO(csv))
-                    unique_target_values = old_data[
+                result_dataframe = pd.DataFrame(
+                    predictions, columns=[target_feature.name]
+                )
+                if target_feature.type == "numerical":
+                    # Limit the number of decimals in the predictions.
+                    formatted_column = result_dataframe[
                         target_feature.name
-                    ].unique()
-                    predictions = [
-                        unique_target_values[pred] for pred in predictions
-                    ]
-                st.write(predictions)
+                    ].map("{:,.4f}".format)
+                    result_dataframe[target_feature.name] = formatted_column
+
+                st.write("### Predictions:")
+                st.write(result_dataframe)
+
+                # Allow the user to download all predictions
+                csv_data = result_dataframe.to_csv()
+                st.download_button(
+                    label="Download Predictions as csv.",
+                    data=csv_data,
+                    file_name="predictions.csv",
+                    mime="text/csv",
+                )
             except DatasetValidationError as e:
                 st.write(str(e))

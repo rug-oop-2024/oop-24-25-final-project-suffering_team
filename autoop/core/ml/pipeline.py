@@ -1,6 +1,6 @@
 import io
 import pickle
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from autoop.core.ml.artifact import Artifact
 from autoop.core.ml.dataset import Dataset
@@ -207,7 +207,13 @@ class Pipeline:
             self._metrics_results.append((metric, result))
         encoder = list(self._artifacts[self._target_feature.name].values())[1]
         if encoder.__class__.__name__ == "StandardScaler":
+            # Restore the original values using the encoder
             predictions = encoder.inverse_transform(predictions)
+        else:
+            # Restore the original labels using the encoder
+            predictions = [
+                encoder.categories_[0][index] for index in predictions
+            ]
         self._predictions = predictions
 
     def execute(self) -> dict[str, list]:
@@ -317,4 +323,5 @@ class Pipeline:
         if encoder.__class__.__name__ == "StandardScaler":
             # Return the original values using the encoder
             return encoder.inverse_transform(predictions)
-        return predictions
+        # Return the original labels using the encoder
+        return [encoder.categories_[0][index] for index in predictions]
