@@ -11,6 +11,10 @@ import streamlit as st
 
 from exceptions import DatasetValidationError
 
+if "executed_pipeline" in st.session_state:
+    st.session_state.result = None
+    st.session_state.executed_pipeline = None
+
 automl = AutoMLSystem.get_instance()
 
 st.set_page_config(page_title="Deployment", page_icon="🚀")
@@ -26,6 +30,17 @@ name = st.selectbox(
 )
 
 if name is not None:
+    # This needs fixing as the storage deletes only the objects.
+    st.write("## Delete pipeline")
+    if st.button("Delete pipeline"):
+        for pipeline in pipelines:
+            if pipeline.name == name:
+                pipeline_to_delete = pipeline
+                break
+        for artifact_id in pipeline_to_delete.metadata.values():
+            automl.registry.delete(artifact_id)
+        automl.registry.delete(pipeline.id)
+
     # Load the pipeline data
     for pipeline in pipelines:
         if pipeline.name == name:
