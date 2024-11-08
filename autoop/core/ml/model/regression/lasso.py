@@ -7,7 +7,7 @@ from sklearn.linear_model import Lasso as SkLasso
 class Lasso(Model):
     """A Lasso implementation of the Model class."""
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, alpha=0.01, **kwargs) -> None:
         """Initialize the lasso model with the provided parameters.
 
         Args:
@@ -15,7 +15,7 @@ class Lasso(Model):
             **kwargs: Keyword arguments for Lasso's parameters.
         """
         super().__init__()
-        self._model = SkLasso(*args, **kwargs)
+        self._model = SkLasso(*args, alpha=alpha, **kwargs)
         # Add hyper parameters to the parameters dictionary using the setter.
         new_parameters = self._model.get_params()
         self.parameters = new_parameters
@@ -51,7 +51,9 @@ class Lasso(Model):
                 Row dimension is samples, column dimension is variables.
 
         Returns:
-            list: Predicted values for the observations.
+            np.ndarray: Predicted values for the observations.
+                Formatted like [[value],[value]].
         """
         self._check_predict_requirements(observations)
-        return self._model.predict(observations)
+        # Predictions should be two dimensional
+        return self._model.predict(observations).reshape(-1, 1)

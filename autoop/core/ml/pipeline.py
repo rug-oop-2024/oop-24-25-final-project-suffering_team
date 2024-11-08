@@ -1,6 +1,6 @@
 import io
 import pickle
-from typing import TYPE_CHECKING, List
+from typing import List, TYPE_CHECKING
 
 from autoop.core.ml.artifact import Artifact
 from autoop.core.ml.dataset import Dataset
@@ -15,7 +15,6 @@ from autoop.functional.preprocessing import preprocess_features
 
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 from exceptions import DatasetValidationError
 
@@ -181,7 +180,6 @@ class Pipeline:
         Returns:
             np.array: The combined vectors in one array.
         """
-
         return np.concatenate(vectors, axis=1)
 
     def _train(self) -> None:
@@ -315,10 +313,8 @@ class Pipeline:
 
         observations = self._compact_vectors(self._input_vectors)
         encoder = self._artifacts[self._target_feature.name]
+        predictions = self._model.predict(observations)
         if encoder.__class__.__name__ == "StandardScaler":
-            predictions = encoder.inverse_transform(
-                self._model.predict(observations)
-            )
-        else:
-            predictions = self._model.predict(observations)
+            # Return the original values using the encoder
+            return encoder.inverse_transform(predictions)
         return predictions

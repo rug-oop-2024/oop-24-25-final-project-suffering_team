@@ -51,7 +51,8 @@ class Ridge(Model):
                 Row dimension is samples, column dimension is variables.
 
         Returns:
-            list: Predicted values for the observations.
+            np.ndarray: Predicted values for the observations.
+                Formatted like [[value],[value]].
         """
         self._check_predict_requirements(observations)
         return self._model.predict(observations)
