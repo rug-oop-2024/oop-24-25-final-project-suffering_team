@@ -50,19 +50,22 @@ if name is not None:
     st.write(correct_pipeline.id)
     pipeline_setup = automl.registry.get(correct_pipeline.id)
     pipeline_data = pickle.loads(pipeline_setup.data)
+    target_feature = pipeline_data.get("target_feature")
 
     for key in pipeline_setup.metadata:
         if "pipeline_model" in key:
             model_id = pipeline_setup.metadata[key]
-            break
+        elif key == target_feature.name:
+            target_id = pipeline_setup.metadata[key]
     model_setup = automl.registry.get(model_id)
     recreated_model = Model.from_artifact(model_setup)
 
+    target_setup = automl.registry.get(target_id)
+    encoder = pickle.loads(target_setup.data)
     pipeline_setup.data = pipeline_data
     pipeline_setup.metadata[key] = recreated_model
 
     input_features = pipeline_data.get("input_features")
-    target_feature = pipeline_data.get("target_feature")
     metrics = pipeline_data.get("metrics")
     split = pipeline_data.get("split")
     old_dataset = pipeline_data.get("dataset")
@@ -134,6 +137,7 @@ if name is not None:
             target_feature=target_feature,
             split=0,
         )
+        loaded_pipeline._register_artifact(target_feature.name, encoder)
         if st.button("Predict"):
             try:
                 predictions = loaded_pipeline.make_predictions(new_dataset)

@@ -313,5 +313,5 @@ class Pipeline:
         self._preprocess_prediction_columns(new_dataset)
 
         observations = self._compact_vectors(self._input_vectors)
-        encoder = list(self._artifacts[self._target_feature.name].values())[1]
+        encoder = self._artifacts[self._target_feature.name]
         return encoder.inverse_transform(self._model.predict(observations))
