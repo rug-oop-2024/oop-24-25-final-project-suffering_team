@@ -96,10 +96,10 @@ Some examples include housing prices, second-hand cars, etc.
 
 ### Checklist
 - [X] I have read the instructions carefully.
-- [ ] I have filled my personal rubric.
-- [ ] The code is refactored to style standards.
-- [ ] I have passed my tests.
-- [ ] I have documented my code and decisions.
+- [X] I have filled my personal rubric.
+- [X] The code is refactored to style standards.
+- [X] I have passed my tests.
+- [X] I have documented my code and decisions.
 
 # Grading & Submission (IMPORTANT)
 
@@ -153,13 +153,13 @@ If you did not implement the feature
 
 | Requirement                           | Type (FN/NF) | Implemented by       | Implementation Completed (add X if done) | Comment |
 |-------------------------------------- |--------------|----------------------|--------------------------|---------|
-| Up-to-date requirements.txt           | NF           |                      |         | |
+| Up-to-date requirements.txt           | NF           |   Both               |    X    | |
 | `ML/detect-features`                  | FN           |   Richard            |    X    | |
-| `ML/artifact`                         | NF           |   both               |    X    | |
-| `ML/feature`                          | NF           |   both               |    X    | |
-| `ML/metric`                           | NF           |   both               |    X    | |
-| `ML/metric/extensions`                | FN           |   both               |    X    | |
-| `ML/model`                            | NF           |   both               |    X    | |
+| `ML/artifact`                         | NF           |   Both               |    X    | |
+| `ML/feature`                          | NF           |   Both               |    X    | |
+| `ML/metric`                           | NF           |   Both               |    X    | |
+| `ML/metric/extensions`                | FN           |   Both               |    X    | |
+| `ML/model`                            | NF           |   Both               |    X    | |
 | `ML/model/extensions`                 | FN           |   Remco              |    X    | |
 | `ML/pipeline/evaluation`              | FN           |   Remco              |    X    | |
 | `ST/page/datasets`                    | NF           |   Richard            |    X    | |
@@ -173,10 +173,10 @@ If you did not implement the feature
 | `ST/modelling/pipeline/metrics`       | FN           |   Both               |    X    | |
 | `ST/modelling/pipeline/summary`       | FN           |   Both               |    X    | |
 | `ST/modelling/pipeline/train`         | FN           |   Both               |    X    | |
-| `ST/modelling/pipeline/save`          | FN           |                      |         | |
-| `ST/page/deployment`                  | FN           |                      |         | |
-| `ST/deployment/load`                  | FN           |                      |         | |
-| `ST/deployment/predict`               | FN           |                      |         | |
+| `ST/modelling/pipeline/save`          | FN           |   Both               |    X    | |
+| `ST/page/deployment`                  | FN           |   Both               |    X    | |
+| `ST/deployment/load`                  | FN           |   Both               |    X    | |
+| `ST/deployment/predict`               | FN           |   Both               |    X    | |
 
 If you add extra features, please indicate them below:
 | Requirement                           | Type (FN/NF) | Implemented by       | Implementation Completed (add X if done) | Comment |

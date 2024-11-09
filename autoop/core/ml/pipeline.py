@@ -57,7 +57,7 @@ class Pipeline:
         self._artifacts = {}
         self._split = split
         if (
-            target_feature.type == "categorical" 
+            target_feature.type == "categorical"
             and model.type != "classification"
         ):
             raise ValueError(

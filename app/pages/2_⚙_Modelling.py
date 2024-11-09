@@ -43,8 +43,9 @@ if "new_predictions" in st.session_state:
 
 st.write("# ⚙ Modelling")
 write_helper_text(
-    "".join(("In this section, you can design a ",
-    "machine learning pipeline to train a model on a dataset."))
+    "".join((
+        "In this section, you can design a ",
+        "machine learning pipeline to train a model on a dataset."))
 )
 
 automl = AutoMLSystem.get_instance()
