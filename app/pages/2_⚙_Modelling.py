@@ -43,8 +43,8 @@ if "new_predictions" in st.session_state:
 
 st.write("# ⚙ Modelling")
 write_helper_text(
-    "In this section, you can design a "
-    + "machine learning pipeline to train a model on a dataset."
+    "".join(("In this section, you can design a ",
+    "machine learning pipeline to train a model on a dataset."))
 )
 
 automl = AutoMLSystem.get_instance()
@@ -235,38 +235,53 @@ if selected_model and selected_metrics and selected_features:
         pipeline_version = st.text_input(
             "Give the version of the pipeline", "1.0.0"
         )
-        if st.button("Save pipeline"):
-            pipeline = st.session_state.executed_pipeline
-            all_artifacts = pipeline.artifacts
-            for artifact in all_artifacts:
-                if artifact.name == "pipeline_config":
-                    artifact.name = pipeline_name
-                    artifact.asset_path = pipeline_name
-                    artifact.version = pipeline_version
-                    artifact.type = "pipeline"
-
-                    encoded_path = artifact._base64_encode(artifact.asset_path)
-                    artifact.id = f"{encoded_path}-{artifact.version}"
-
-                    pipeline_artifact = artifact
-                elif artifact.type == "model":
-                    artifact.version = pipeline_version
-                    artifact.asset_path = "-".join(
-                        (
-                            f"{pipeline_name}",
-                            f"{pipeline_version}",
-                            f"{artifact.name}",
-                        )
-                    )
-                    encoded_path = artifact._base64_encode(artifact.asset_path)
-                    artifact.id = f"{encoded_path}-{artifact.version}"
-                    automl._registry.register(artifact)
-                else:
-                    automl._registry.register(artifact)
-            for artifact in all_artifacts:
-                if artifact.type != "pipeline":
-                    pipeline_artifact.save_metadata(artifact)
-            automl._registry.register(pipeline_artifact)
-            st.success(
-                f"Pipeline '{pipeline_name}' has been saved successfully!"
+        if (pipeline_name, pipeline_version) in (
+            (pipeline.name, pipeline.version) for pipeline in pipelines
+        ):
+            st.write(
+                "This name and version is already saved\n",
+                "Saved pipelines:",
+                ((pipeline.name, pipeline.version) for pipeline in pipelines),
             )
+        else:
+            if st.button("Save pipeline"):
+                pipeline = st.session_state.executed_pipeline
+                all_artifacts = pipeline.artifacts
+                for artifact in all_artifacts:
+                    if artifact.name == "pipeline_config":
+                        artifact.name = pipeline_name
+                        artifact.asset_path = (
+                            f"{pipeline_name}-{pipeline_version}"
+                        )
+                        artifact.version = pipeline_version
+                        artifact.type = "pipeline"
+
+                        encoded_path = artifact._base64_encode(
+                            artifact.asset_path
+                        )
+                        artifact.id = f"{encoded_path}-{artifact.version}"
+
+                        pipeline_artifact = artifact
+                    elif artifact.type == "model":
+                        artifact.version = pipeline_version
+                        artifact.asset_path = "-".join(
+                            (
+                                f"{pipeline_name}",
+                                f"{pipeline_version}",
+                                f"{artifact.name}",
+                            )
+                        )
+                        encoded_path = artifact._base64_encode(
+                            artifact.asset_path
+                        )
+                        artifact.id = f"{encoded_path}-{artifact.version}"
+                        automl._registry.register(artifact)
+                    else:
+                        automl._registry.register(artifact)
+                for artifact in all_artifacts:
+                    if artifact.type != "pipeline":
+                        pipeline_artifact.save_metadata(artifact)
+                automl._registry.register(pipeline_artifact)
+                st.success(
+                    f"Pipeline '{pipeline_name}' has been saved successfully!"
+                )

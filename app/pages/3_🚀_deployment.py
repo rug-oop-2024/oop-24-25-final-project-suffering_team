@@ -28,7 +28,7 @@ datasets = automl.registry.list(type="dataset")
 st.write("# Pipeline Selection:")
 name = st.selectbox(
     "Choose pipeline to use to predict on new dataset:",
-    (pipeline.name for pipeline in pipelines),
+    (f"{pipeline.name} version: {pipeline.version}" for pipeline in pipelines),
     index=None,
 )
 
@@ -37,7 +37,7 @@ if name is not None:
     st.write("## Delete pipeline:")
     if st.button("Delete pipeline"):
         for pipeline in pipelines:
-            if pipeline.name == name:
+            if f"{pipeline.name} version: {pipeline.version}" == name:
                 pipeline_to_delete = pipeline
                 break
         for artifact_key in pipeline_to_delete.metadata.keys():
@@ -49,10 +49,9 @@ if name is not None:
 
     # Load the pipeline data
     for pipeline in pipelines:
-        if pipeline.name == name:
+        if f"{pipeline.name} version: {pipeline.version}" == name:
             correct_pipeline = pipeline
             break
-    st.write(correct_pipeline.id)
     pipeline_setup = automl.registry.get(correct_pipeline.id)
     pipeline_data = pickle.loads(pipeline_setup.data)
     target_feature = pipeline_data.get("target_feature")

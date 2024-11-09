@@ -7,7 +7,7 @@ from sklearn.linear_model import Lasso as SkLasso
 class Lasso(Model):
     """A Lasso implementation of the Model class."""
 
-    def __init__(self, *args, alpha=0.01, **kwargs) -> None:
+    def __init__(self, *args, alpha: float = 0.01, **kwargs) -> None:
         """Initialize the lasso model with the provided parameters.
 
         Args:
