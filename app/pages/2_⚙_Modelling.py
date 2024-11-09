@@ -38,6 +38,9 @@ if "executed_pipeline" not in st.session_state:
     st.session_state.result = None
     st.session_state.executed_pipeline = None
 
+if "new_predictions" in st.session_state:
+    st.session_state.new_predictions = None
+
 st.write("# ⚙ Modelling")
 write_helper_text(
     "In this section, you can design a "
@@ -47,6 +50,7 @@ write_helper_text(
 automl = AutoMLSystem.get_instance()
 
 datasets = automl.registry.list(type="dataset")
+pipelines = automl.registry.list(type="pipeline")
 
 metrics = []
 selected_metrics = False
@@ -185,7 +189,7 @@ if selected_model and selected_metrics and selected_features:
         predictions = result["predictions"]
         # Get the original labels
 
-        st.write("## Pipeline Results:")
+        st.write("## Last Executed Pipeline Results:")
 
         st.write("### Train metrics:")
         for metric_result in train_result:
@@ -226,7 +230,7 @@ if selected_model and selected_metrics and selected_features:
         )
 
         # The pipeline needs to have a trained model before it can be saved.
-        st.write("## Save Pipeline:")
+        st.write("## Save Last Executed Pipeline:")
         pipeline_name = st.text_input("Give name to pipeline:", "MyPipeline")
         pipeline_version = st.text_input(
             "Give the version of the pipeline", "1.0.0"
@@ -247,7 +251,13 @@ if selected_model and selected_metrics and selected_features:
                     pipeline_artifact = artifact
                 elif artifact.type == "model":
                     artifact.version = pipeline_version
-                    artifact.asset_path = f"{pipeline_name}-{artifact.name}"
+                    artifact.asset_path = "-".join(
+                        (
+                            f"{pipeline_name}",
+                            f"{pipeline_version}",
+                            f"{artifact.name}",
+                        )
+                    )
                     encoded_path = artifact._base64_encode(artifact.asset_path)
                     artifact.id = f"{encoded_path}-{artifact.version}"
                     automl._registry.register(artifact)

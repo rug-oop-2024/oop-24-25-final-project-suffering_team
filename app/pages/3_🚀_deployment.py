@@ -11,6 +11,13 @@ import streamlit as st
 
 from exceptions import DatasetValidationError
 
+if "executed_pipeline" in st.session_state:
+    st.session_state.result = None
+    st.session_state.executed_pipeline = None
+
+if "new_predictions" not in st.session_state:
+    st.session_state.new_predictions = None
+
 automl = AutoMLSystem.get_instance()
 
 st.set_page_config(page_title="Deployment", page_icon="🚀")
@@ -33,8 +40,10 @@ if name is not None:
             if pipeline.name == name:
                 pipeline_to_delete = pipeline
                 break
-        for artifact_id in pipeline_to_delete.metadata.values():
-            automl.registry.delete(artifact_id)
+        for artifact_key in pipeline_to_delete.metadata.keys():
+            if "pipeline_model" in artifact_key:
+                artifact_id = pipeline_to_delete.metadata[artifact_key]
+                automl.registry.delete(artifact_id)
         automl.registry.delete(pipeline.id)
         st.rerun()
 
@@ -146,17 +155,19 @@ if name is not None:
                         target_feature.name
                     ].map("{:,.4f}".format)
                     result_dataframe[target_feature.name] = formatted_column
-
-                st.write("### Predictions:")
-                st.write(result_dataframe)
-
-                # Allow the user to download all predictions
-                csv_data = result_dataframe.to_csv()
-                st.download_button(
-                    label="Download Predictions as csv.",
-                    data=csv_data,
-                    file_name="predictions.csv",
-                    mime="text/csv",
-                )
+                st.session_state.new_predictions = result_dataframe
             except DatasetValidationError as e:
                 st.write(str(e))
+        if st.session_state.new_predictions is not None:
+            result_dataframe = st.session_state.new_predictions
+            st.write("### Last Predictions:")
+            st.write(result_dataframe)
+
+            # Allow the user to download all predictions
+            csv_data = result_dataframe.to_csv()
+            st.download_button(
+                label="Download Predictions as csv.",
+                data=csv_data,
+                file_name="predictions.csv",
+                mime="text/csv",
+            )
