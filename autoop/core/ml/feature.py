@@ -8,8 +8,26 @@ class Feature:
             name (str): The name of the feature.
             column_type (str): The type of feature, categorical or numerical.
         """
-        self.name = name
-        self.type = column_type
+        self._name = name
+        self._type = column_type
+
+    @property
+    def name(self) -> str:
+        """Get name of feature.
+
+        Returns:
+            str: name of feature
+        """
+        return self._name
+
+    @property
+    def type(self) -> str:
+        """Get type of feature.
+
+        Returns:
+            str: type of feature
+        """
+        return self._type
 
     def __str__(self) -> str:
         """Return the name and variables of the feature.
