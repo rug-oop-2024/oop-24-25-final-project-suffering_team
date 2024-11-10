@@ -43,9 +43,12 @@ if "new_predictions" in st.session_state:
 
 st.write("# ⚙ Modelling")
 write_helper_text(
-    "".join((
-        "In this section, you can design a ",
-        "machine learning pipeline to train a model on a dataset."))
+    "".join(
+        (
+            "In this section, you can design a ",
+            "machine learning pipeline to train a model on a dataset.",
+        )
+    )
 )
 
 automl = AutoMLSystem.get_instance()
@@ -250,22 +253,22 @@ if selected_model and selected_metrics and selected_features:
                 all_artifacts = pipeline.artifacts
                 for artifact in all_artifacts:
                     if artifact.name == "pipeline_config":
-                        artifact.name = pipeline_name
-                        artifact.asset_path = (
+                        artifact._name = pipeline_name
+                        artifact._asset_path = (
                             f"{pipeline_name}-{pipeline_version}"
                         )
-                        artifact.version = pipeline_version
-                        artifact.type = "pipeline"
+                        artifact._version = pipeline_version
+                        artifact._type = "pipeline"
 
                         encoded_path = artifact._base64_encode(
                             artifact.asset_path
                         )
-                        artifact.id = f"{encoded_path}-{artifact.version}"
+                        artifact._id = f"{encoded_path}-{artifact.version}"
 
                         pipeline_artifact = artifact
                     elif artifact.type == "model":
-                        artifact.version = pipeline_version
-                        artifact.asset_path = "-".join(
+                        artifact._version = pipeline_version
+                        artifact._asset_path = "-".join(
                             (
                                 f"{pipeline_name}",
                                 f"{pipeline_version}",
@@ -275,7 +278,7 @@ if selected_model and selected_metrics and selected_features:
                         encoded_path = artifact._base64_encode(
                             artifact.asset_path
                         )
-                        artifact.id = f"{encoded_path}-{artifact.version}"
+                        artifact._id = f"{encoded_path}-{artifact.version}"
                         automl._registry.register(artifact)
                     else:
                         automl._registry.register(artifact)

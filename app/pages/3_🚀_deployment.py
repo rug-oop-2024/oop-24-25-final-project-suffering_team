@@ -66,8 +66,8 @@ if name is not None:
 
     target_setup = automl.registry.get(target_id)
     encoder = pickle.loads(target_setup.data)
-    pipeline_setup.data = pipeline_data
-    pipeline_setup.metadata[key] = recreated_model
+    pipeline_setup._data = pipeline_data
+    pipeline_setup._metadata[key] = recreated_model
 
     input_features = pipeline_data.get("input_features")
     metrics = pipeline_data.get("metrics")

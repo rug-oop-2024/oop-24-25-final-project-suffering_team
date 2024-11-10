@@ -294,7 +294,7 @@ class Pipeline:
         ]
         # Reorder the columns using the list of column names in the correct
         new_data_reordered = full_data[expected_column_order]
-        new_dataset.data = new_data_reordered.to_csv(index=False).encode()
+        new_dataset._data = new_data_reordered.to_csv(index=False).encode()
         input_results = preprocess_features(self._input_features, new_dataset)
         for feature_name, _data, artifact in input_results:
             self._register_artifact(feature_name, artifact)
