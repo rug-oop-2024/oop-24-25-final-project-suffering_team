@@ -10,13 +10,12 @@ from autoop.core.ml.metric import Metric
 if TYPE_CHECKING:
     from autoop.core.ml.model import Model
 
+from autoop.core.exceptions import DatasetValidationError
 from autoop.functional.feature import detect_feature_types
 from autoop.functional.preprocessing import preprocess_features
 
 import numpy as np
 import pandas as pd
-
-from exceptions import DatasetValidationError
 
 
 class Pipeline:
@@ -56,12 +55,14 @@ class Pipeline:
         self._metrics = metrics
         self._artifacts = {}
         self._split = split
-        if target_feature.type == "categorical":
-            if model.type != "classification":
-                raise ValueError(
-                    "Model type must be classification",
-                    "for categorical target feature",
-                )
+        if (
+            target_feature.type == "categorical"
+            and model.type != "classification"
+        ):
+            raise ValueError(
+                "Model type must be classification",
+                "for categorical target feature",
+            )
         if target_feature.type == "continuous" and model.type != "regression":
             raise ValueError(
                 "Model type must be regression for continuous target feature"
