@@ -10,13 +10,12 @@ from autoop.core.ml.metric import Metric
 if TYPE_CHECKING:
     from autoop.core.ml.model import Model
 
+from autoop.core.exceptions import DatasetValidationError
 from autoop.functional.feature import detect_feature_types
 from autoop.functional.preprocessing import preprocess_features
 
 import numpy as np
 import pandas as pd
-
-from exceptions import DatasetValidationError
 
 
 class Pipeline:
@@ -154,18 +153,18 @@ class Pipeline:
         """Split the data into training and testing sets."""
         split = self._split
         self._train_X = [
-            vector[:int(split * len(vector))]
+            vector[: int(split * len(vector))]
             for vector in self._input_vectors
         ]
         self._test_X = [
-            vector[int(split * len(vector)):]
+            vector[int(split * len(vector)) :]
             for vector in self._input_vectors
         ]
         self._train_y = self._output_vector[
-            :int(split * len(self._output_vector))
+            : int(split * len(self._output_vector))
         ]
         self._test_y = self._output_vector[
-            int(split * len(self._output_vector)):
+            int(split * len(self._output_vector)) :
         ]
 
     def _compact_vectors(self, vectors: List[np.array]) -> np.array:

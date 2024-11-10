@@ -2,14 +2,13 @@ import io
 import pickle
 
 from app.core.system import AutoMLSystem
+from autoop.core.exceptions import DatasetValidationError
 from autoop.core.ml.dataset import Dataset
 from autoop.core.ml.model.model import Model
 from autoop.core.ml.pipeline import Pipeline
 
 import pandas as pd
 import streamlit as st
-
-from exceptions import DatasetValidationError
 
 if "executed_pipeline" in st.session_state:
     st.session_state.result = None
