@@ -163,17 +163,17 @@ If you did not implement the feature
 | `ML/model/extensions`                 | FN           |   Remco              |    X    | |
 | `ML/pipeline/evaluation`              | FN           |   Remco              |    X    | |
 | `ST/page/datasets`                    | NF           |   Richard            |    X    | |
-| `ST/datasets/management/create`       | FN           |   Richard            |    X    |Upload a csv file in the app. We got some datasets in the datasets folder in the root folder. This folder contains datasets to be uploaded here. Three datasets contain the word new these are to be used for the deployment predict these should contain the same columns as you used as input features and no more or less columns so if you use different target feature or input features of a dataset you will have to create a different csv file for the deployment predict yourself.|
-| `ST/datasets/management/save`         | FN           |   Richard            |    X    |Press the save button|
+| `ST/datasets/management/create`       | FN           |   Richard            |    X    |Upload a csv file in the app. We got some datasets in the datasets folder in the root folder. This folder contains datasets to be uploaded using this page. Three datasets contain the word new these are to be used for the deployment/predict these should contain the same columns as you used as input features and no more or less columns so if you use different target feature or input features of a dataset you will have to create a different csv file for the deployment/predict yourself.|
+| `ST/datasets/management/save`         | FN           |   Richard            |    X    |Press the save button. Shuffling before saving is recommended.|
 | `ST/page/modelling`                   | NF           |   Both               |    X    | |
 | `ST/modelling/datasets/list`          | FN           |   Both               |    X    |Choose a dataset that was uploaded|
-| `ST/modelling/datasets/features`      | FN           |   Both               |    X    |After choose target feature and input features. Please don't choose ID columns and we prefer if you chose the column that is not in the new dataset (except for ID columns) as the target column. As that is normally the intended target of the dataset.|
+| `ST/modelling/datasets/features`      | FN           |   Both               |    X    |Afterwards choose a target feature and input features. Please don't choose ID columns and we prefer if you chose the column that is not in the new dataset (except for ID columns) as the target column. As that is normally the intended target of the dataset.|
 | `ST/modelling/models`                 | FN           |   Both               |    X    |Choose model to use in pipeline|
-| `ST/modelling/pipeline/split`         | FN           |   Both               |    X    |Choose split for data after metrics|
+| `ST/modelling/pipeline/split`         | FN           |   Both               |    X    |Choose split for data after choosing metrics|
 | `ST/modelling/pipeline/metrics`       | FN           |   Both               |    X    |Choose the metrics to evaluate the predictions|
 | `ST/modelling/pipeline/summary`       | FN           |   Both               |    X    | |
 | `ST/modelling/pipeline/train`         | FN           |   Both               |    X    |Press the execute pipeline button after summary|
-| `ST/modelling/pipeline/save`          | FN           |   Both               |    X    |After execution save last executed pipeline with button|
+| `ST/modelling/pipeline/save`          | FN           |   Both               |    X    |After execution save last executed pipeline with button. Give unique combination of version and name.|
 | `ST/page/deployment`                  | FN           |   Both               |    X    | |
 | `ST/deployment/load`                  | FN           |   Both               |    X    |Choose pipeline that you saved in app|
 | `ST/deployment/predict`               | FN           |   Both               |    X    |Predict the target of the pipeline using dataset with new data for the same input features of the pipeline.|
