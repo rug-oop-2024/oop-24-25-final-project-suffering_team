@@ -33,7 +33,6 @@ name = st.selectbox(
 )
 
 if name is not None:
-    # This needs fixing as the storage deletes only the objects.
     st.write("## Delete pipeline:")
     if st.button("Delete pipeline"):
         for pipeline in pipelines:

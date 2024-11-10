@@ -292,7 +292,7 @@ class Pipeline:
         expected_column_order = [
             feature.name for feature in self._input_features
         ]
-        # Reorder the columns using the list of column names in the correct
+        # Reorder the columns using the list with columns in expected order
         new_data_reordered = full_data[expected_column_order]
         new_dataset._data = new_data_reordered.to_csv(index=False).encode()
         input_results = preprocess_features(self._input_features, new_dataset)
