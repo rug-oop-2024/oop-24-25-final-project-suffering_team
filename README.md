@@ -163,22 +163,25 @@ If you did not implement the feature
 | `ML/model/extensions`                 | FN           |   Remco              |    X    | |
 | `ML/pipeline/evaluation`              | FN           |   Remco              |    X    | |
 | `ST/page/datasets`                    | NF           |   Richard            |    X    | |
-| `ST/datasets/management/create`       | FN           |   Richard            |    X    | |
-| `ST/datasets/management/save`         | FN           |   Richard            |    X    | |
+| `ST/datasets/management/create`       | FN           |   Richard            |    X    |Upload a csv file in the app|
+| `ST/datasets/management/save`         | FN           |   Richard            |    X    |Press the save button|
 | `ST/page/modelling`                   | NF           |   Both               |    X    | |
-| `ST/modelling/datasets/list`          | FN           |   Both               |    X    | |
-| `ST/modelling/datasets/features`      | FN           |   Both               |    X    | |
-| `ST/modelling/models`                 | FN           |   Both               |    X    | |
-| `ST/modelling/pipeline/split`         | FN           |   Both               |    X    | |
-| `ST/modelling/pipeline/metrics`       | FN           |   Both               |    X    | |
+| `ST/modelling/datasets/list`          | FN           |   Both               |    X    |Choose a dataset that was uploaded|
+| `ST/modelling/datasets/features`      | FN           |   Both               |    X    |After choose target feature and input features|
+| `ST/modelling/models`                 | FN           |   Both               |    X    |Choose model to use in pipeline|
+| `ST/modelling/pipeline/split`         | FN           |   Both               |    X    |Choose split for data after metrics|
+| `ST/modelling/pipeline/metrics`       | FN           |   Both               |    X    |Choose the metrics to evaluate the predictions|
 | `ST/modelling/pipeline/summary`       | FN           |   Both               |    X    | |
-| `ST/modelling/pipeline/train`         | FN           |   Both               |    X    | |
-| `ST/modelling/pipeline/save`          | FN           |   Both               |    X    | |
+| `ST/modelling/pipeline/train`         | FN           |   Both               |    X    |Press the execute pipeline button after summary|
+| `ST/modelling/pipeline/save`          | FN           |   Both               |    X    |After execution save last executed pipeline with button|
 | `ST/page/deployment`                  | FN           |   Both               |    X    | |
-| `ST/deployment/load`                  | FN           |   Both               |    X    | |
-| `ST/deployment/predict`               | FN           |   Both               |    X    | |
+| `ST/deployment/load`                  | FN           |   Both               |    X    |Choose pipeline that you saved in app|
+| `ST/deployment/predict`               | FN           |   Both               |    X    |Predict the target of the pipeline using dataset with new data for the same input features of the pipeline.|
 
 If you add extra features, please indicate them below:
 | Requirement                           | Type (FN/NF) | Implemented by       | Implementation Completed (add X if done) | Comment |
 |-------------------------------------- |--------------|----------------------|---------|-----|
-|           |            |                      |         | |
+| `ST/modelling/datasets/delete`        | FN           |   Both               |    X    |Press delete dataset to delete dataset from storage|
+| `ST/modelling/predict/download`       | FN           |   Both               |    X    |Download the predictions that were made|
+| `ST/deployment/pipeline/delete`       | FN           |   Both               |    X    |Press delete pipeline to delete pipeline and model of pipeline from storage. Column artifacts will not be deleted otherwise it breaks other pipelines with same columns.|
+| `ST/deployment/predict/download`      | FN           |   Both               |    X    |Download predictions|

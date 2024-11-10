@@ -1,4 +1,5 @@
 from typing import List
+from pandas.api.types import is_numeric_dtype
 
 from autoop.core.ml.dataset import Dataset
 from autoop.core.ml.feature import Feature
@@ -18,11 +19,10 @@ def detect_feature_types(dataset: Dataset) -> List[Feature]:
     for column in columns:
         name = column
         values = data[column]
-
-        try:
+        if is_numeric_dtype(values):
             float(values[0])
             column_type = "numerical"
-        except ValueError:
+        else:
             column_type = "categorical"
         feature = Feature(name, column_type)
         features.append(feature)
