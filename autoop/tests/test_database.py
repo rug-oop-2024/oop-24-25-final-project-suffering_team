@@ -1,12 +1,12 @@
+import random
+import tempfile
 import unittest
 
 from autoop.core.database import Database
 from autoop.core.storage import LocalStorage
-import random
-import tempfile
+
 
 class TestDatabase(unittest.TestCase):
-
     def setUp(self):
         self.storage = LocalStorage(tempfile.mkdtemp())
         self.db = Database(self.storage)
@@ -15,38 +15,38 @@ class TestDatabase(unittest.TestCase):
         self.assertIsInstance(self.db, Database)
 
     def test_set(self):
-        id = str(random.randint(0, 100))
+        data_id = str(random.randint(0, 100))
         entry = {"key": random.randint(0, 100)}
-        self.db.set("collection", id, entry)
-        self.assertEqual(self.db.get("collection", id)["key"], entry["key"])
+        self.db.set_data("collection", data_id, entry)
+        self.assertEqual(self.db.get("collection", data_id)["key"], entry["key"])
 
     def test_delete(self):
-        id = str(random.randint(0, 100))
+        data_id = str(random.randint(0, 100))
         value = {"key": random.randint(0, 100)}
-        self.db.set("collection", id, value)
-        self.db.delete("collection", id)
-        self.assertIsNone(self.db.get("collection", id))
+        self.db.set_data("collection", data_id, value)
+        self.db.delete("collection", data_id)
+        self.assertIsNone(self.db.get("collection", data_id))
         self.db.refresh()
-        self.assertIsNone(self.db.get("collection", id))
+        self.assertIsNone(self.db.get("collection", data_id))
 
     def test_persistance(self):
-        id = str(random.randint(0, 100))
+        data_id = str(random.randint(0, 100))
         value = {"key": random.randint(0, 100)}
-        self.db.set("collection", id, value)
+        self.db.set_data("collection", data_id, value)
         other_db = Database(self.storage)
-        self.assertEqual(other_db.get("collection", id)["key"], value["key"])
+        self.assertEqual(other_db.get("collection", data_id)["key"], value["key"])
 
     def test_refresh(self):
         key = str(random.randint(0, 100))
         value = {"key": random.randint(0, 100)}
         other_db = Database(self.storage)
-        self.db.set("collection", key, value)
+        self.db.set_data("collection", key, value)
         other_db.refresh()
         self.assertEqual(other_db.get("collection", key)["key"], value["key"])
 
     def test_list(self):
         key = str(random.randint(0, 100))
         value = {"key": random.randint(0, 100)}
-        self.db.set("collection", key, value)
+        self.db.set_data("collection", key, value)
         # collection should now contain the key
-        self.assertIn((key, value), self.db.list("collection"))
+        self.assertIn((key, value), self.db.data_list("collection"))

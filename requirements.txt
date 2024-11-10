@@ -1,5 +1,7 @@
+#python=3.12
 streamlit
-pydantic
 pandas
 numpy
 scikit-learn
+sphinx
+sphinx_rtd_theme

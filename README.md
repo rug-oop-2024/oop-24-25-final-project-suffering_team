@@ -91,15 +91,15 @@ You can place your decisions in a docs folder in the root of the project.
 E.g. docs/decisions/DSC-0001-use-typescript.md
 
 ### 📈 Testing
-* Showcase the capability of your streamlit app with at least 3 different usecases on real datasets (from Kaggle). 
+* Showcase the capability of your streamlit app with at least 3 different usecases on real datasets (from Kaggle).
 Some examples include housing prices, second-hand cars, etc.
 
 ### Checklist
-- [ ] I have read the instructions carefully.
-- [ ] I have filled my personal rubric.
-- [ ] The code is refactored to style standards.
-- [ ] I have passed my tests.
-- [ ] I have documented my code and decisions.
+- [X] I have read the instructions carefully.
+- [X] I have filled my personal rubric.
+- [X] The code is refactored to style standards.
+- [X] I have passed my tests.
+- [X] I have documented my code and decisions.
 
 # Grading & Submission (IMPORTANT)
 
@@ -152,33 +152,37 @@ If the feature has been implemented by both students, write `both`.
 If you did not implement the feature
 
 | Requirement                           | Type (FN/NF) | Implemented by       | Implementation Completed (add X if done) | Comment |
-|-------------------------------------- |--------------|----------------------|--------------------------|---------|         
-| Up-to-date requirements.txt           | NF           |                      |         | |
-| `ML/detect-features`                  | FN           |                      |         | |
-| `ML/artifact`                         | NF           |                      |         | |
-| `ML/feature`                          | NF           |                      |         | |
-| `ML/metric`                           | NF           |                      |         | |
-| `ML/metric/extensions`                | FN           |                      |         | |
-| `ML/model`                            | NF           |                      |         | |
-| `ML/model/extensions`                 | FN           |                      |         | |
-| `ML/pipeline/evaluation`              | FN           |                      |         | | 
-| `ST/page/datasets`                    | NF           |                      |         | |
-| `ST/datasets/management/create`       | FN           |                      |         | |
-| `ST/datasets/management/save`         | FN           |                      |         | |
-| `ST/page/modelling`                   | NF           |                      |         | |
-| `ST/modelling/datasets/list`          | FN           |                      |         | |
-| `ST/modelling/datasets/features`      | FN           |                      |         | |
-| `ST/modelling/models`                 | FN           |                      |         | |
-| `ST/modelling/pipeline/split`         | FN           |                      |         | |
-| `ST/modelling/pipeline/metrics`       | FN           |                      |         | |
-| `ST/modelling/pipeline/summary`       | FN           |                      |         | |
-| `ST/modelling/pipeline/train`         | FN           |                      |         | |
-| `ST/modelling/pipeline/save`          | FN           |                      |         | |
-| `ST/page/deployment`                  | FN           |                      |         | |
-| `ST/deployment/load`                  | FN           |                      |         | |
-| `ST/deployment/predict`               | FN           |                      |         | |
+|-------------------------------------- |--------------|----------------------|--------------------------|---------|
+| Up-to-date requirements.txt           | NF           |   Both               |    X    | |
+| `ML/detect-features`                  | FN           |   Richard            |    X    | |
+| `ML/artifact`                         | NF           |   Both               |    X    | |
+| `ML/feature`                          | NF           |   Both               |    X    | |
+| `ML/metric`                           | NF           |   Both               |    X    | |
+| `ML/metric/extensions`                | FN           |   Both               |    X    | |
+| `ML/model`                            | NF           |   Both               |    X    | |
+| `ML/model/extensions`                 | FN           |   Remco              |    X    | |
+| `ML/pipeline/evaluation`              | FN           |   Remco              |    X    | |
+| `ST/page/datasets`                    | NF           |   Richard            |    X    | |
+| `ST/datasets/management/create`       | FN           |   Richard            |    X    |Upload a csv file in the app. We got some datasets in the datasets folder in the root folder. This folder contains datasets to be uploaded using this page. Three datasets contain the word new these are to be used for the deployment/predict these should contain the same columns as you used as input features and no more or less columns so if you use different target feature or input features of a dataset you will have to create a different csv file for the deployment/predict yourself.|
+| `ST/datasets/management/save`         | FN           |   Richard            |    X    |Press the save button. Shuffling before saving is recommended.|
+| `ST/page/modelling`                   | NF           |   Both               |    X    | |
+| `ST/modelling/datasets/list`          | FN           |   Both               |    X    |Choose a dataset that was uploaded|
+| `ST/modelling/datasets/features`      | FN           |   Both               |    X    |Afterwards choose a target feature and input features. Please don't choose ID columns and we prefer if you chose the column that is not in the new dataset (except for ID columns) as the target column. As that is normally the intended target of the dataset.|
+| `ST/modelling/models`                 | FN           |   Both               |    X    |Choose model to use in pipeline|
+| `ST/modelling/pipeline/split`         | FN           |   Both               |    X    |Choose split for data after choosing metrics|
+| `ST/modelling/pipeline/metrics`       | FN           |   Both               |    X    |Choose the metrics to evaluate the predictions|
+| `ST/modelling/pipeline/summary`       | FN           |   Both               |    X    | |
+| `ST/modelling/pipeline/train`         | FN           |   Both               |    X    |Press the execute pipeline button after summary|
+| `ST/modelling/pipeline/save`          | FN           |   Both               |    X    |After execution save last executed pipeline with button. Give unique combination of version and name.|
+| `ST/page/deployment`                  | FN           |   Both               |    X    | |
+| `ST/deployment/load`                  | FN           |   Both               |    X    |Choose pipeline that you saved in app|
+| `ST/deployment/predict`               | FN           |   Both               |    X    |Predict the target of the pipeline using dataset with new data for the same input features of the pipeline.|
 
 If you add extra features, please indicate them below:
 | Requirement                           | Type (FN/NF) | Implemented by       | Implementation Completed (add X if done) | Comment |
 |-------------------------------------- |--------------|----------------------|---------|-----|
-|           |            |                      |         | |
+| `ST/modelling/datasets/delete`        | FN           |   Both               |    X    |Press delete dataset to delete dataset from storage|
+| `ST/modelling/predict/download`       | FN           |   Both               |    X    |Download the predictions that were made|
+| `ST/deployment/pipeline/delete`       | FN           |   Both               |    X    |Press delete pipeline to delete pipeline and model of pipeline from storage. Column artifacts will not be deleted otherwise it breaks other pipelines with same columns.|
+| `ST/deployment/predict/download`      | FN           |   Both               |    X    |Download predictions|
+| `docs`                                | FN           |   Remco              |    X    |Create sphinx documentation by running '.\make html' in the docs directory|

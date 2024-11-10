@@ -1,19 +1,29 @@
-from autoop.core.storage import LocalStorage
-from autoop.core.database import Database
-from autoop.core.ml.dataset import Dataset
-from autoop.core.ml.artifact import Artifact
-from autoop.core.storage import Storage
 from typing import List
 
+from autoop.core.database import Database
+from autoop.core.ml.artifact import Artifact
+from autoop.core.storage import LocalStorage, Storage
 
-class ArtifactRegistry():
-    def __init__(self, 
-                 database: Database,
-                 storage: Storage):
+
+class ArtifactRegistry:
+    """Class to register artifacts."""
+
+    def __init__(self, database: Database, storage: Storage) -> None:
+        """Initialize registry.
+
+        Args:
+            database (Database): The database
+            storage (Storage): local storage
+        """
         self._database = database
         self._storage = storage
 
-    def register(self, artifact: Artifact):
+    def register(self, artifact: Artifact) -> None:
+        """Register the artifact.
+
+        Args:
+            artifact (Artifact): artifact to register
+        """
         # save the artifact in the storage
         self._storage.save(artifact.data, artifact.asset_path)
         # save the metadata in the database
@@ -25,10 +35,18 @@ class ArtifactRegistry():
             "metadata": artifact.metadata,
             "type": artifact.type,
         }
-        self._database.set(f"artifacts", artifact.id, entry)
-    
-    def list(self, type: str=None) -> List[Artifact]:
-        entries = self._database.list("artifacts")
+        self._database.set_data("artifacts", artifact.id, entry)
+
+    def list(self, type: str = None) -> List[Artifact]:
+        """Get artrifacts in the registry.
+
+        Args:
+            type (str, optional): type of artifact you need. Defaults to None.
+
+        Returns:
+            List[Artifact]: list of artifacts
+        """
+        entries = self._database.data_list("artifacts")
         artifacts = []
         for id, data in entries:
             if type is not None and data["type"] != type:
@@ -40,12 +58,17 @@ class ArtifactRegistry():
                 tags=data["tags"],
                 metadata=data["metadata"],
                 data=self._storage.load(data["asset_path"]),
-                type=data["type"],
+                artifact_type=data["type"],
             )
             artifacts.append(artifact)
         return artifacts
-    
+
     def get(self, artifact_id: str) -> Artifact:
+        """Get certain artifact.
+
+        Args:
+            artifact_id (str): id of artifact
+        """
         data = self._database.get("artifacts", artifact_id)
         return Artifact(
             name=data["name"],
@@ -54,35 +77,56 @@ class ArtifactRegistry():
             tags=data["tags"],
             metadata=data["metadata"],
             data=self._storage.load(data["asset_path"]),
-            type=data["type"],
+            artifact_type=data["type"],
         )
-    
-    def delete(self, artifact_id: str):
+
+    def delete(self, artifact_id: str) -> None:
+        """Delete artifact from registry.
+
+        Args:
+            artifact_id (str): id of artifact
+        """
         data = self._database.get("artifacts", artifact_id)
         self._storage.delete(data["asset_path"])
         self._database.delete("artifacts", artifact_id)
-    
+
 
 class AutoMLSystem:
+    """Class for system."""
+
     _instance = None
 
-    def __init__(self, storage: LocalStorage, database: Database):
+    def __init__(self, storage: LocalStorage, database: Database) -> None:
+        """Initialize system.
+
+        Args:
+            storage (LocalStorage): storage of system
+            database (Database): database of objects
+        """
         self._storage = storage
         self._database = database
         self._registry = ArtifactRegistry(database, storage)
 
     @staticmethod
-    def get_instance():
+    def get_instance() -> "AutoMLSystem":
+        """Get an instance of this class.
+
+        Returns:
+            AutoMlSystem: returns instance of this class
+        """
         if AutoMLSystem._instance is None:
             AutoMLSystem._instance = AutoMLSystem(
-                LocalStorage("./assets/objects"), 
-                Database(
-                    LocalStorage("./assets/dbo")
-                )
+                LocalStorage("./assets/objects"),
+                Database(LocalStorage("./assets/dbo")),
             )
         AutoMLSystem._instance._database.refresh()
         return AutoMLSystem._instance
-    
+
     @property
-    def registry(self):
+    def registry(self) -> "ArtifactRegistry":
+        """Get artifact registry.
+
+        Returns:
+            ArtifactRegistry: return current registry
+        """
         return self._registry
