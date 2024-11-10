@@ -185,4 +185,4 @@ If you add extra features, please indicate them below:
 | `ST/modelling/predict/download`       | FN           |   Both               |    X    |Download the predictions that were made|
 | `ST/deployment/pipeline/delete`       | FN           |   Both               |    X    |Press delete pipeline to delete pipeline and model of pipeline from storage. Column artifacts will not be deleted otherwise it breaks other pipelines with same columns.|
 | `ST/deployment/predict/download`      | FN           |   Both               |    X    |Download predictions|
-| `docs`                                | FN           |   Remco              |    X    |Create sphinx documentation by running '.\make html' in the docs folder|
+| `docs`                                | FN           |   Remco              |    X    |Create sphinx documentation by running '.\make html' in the docs directory|
