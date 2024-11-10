@@ -202,6 +202,7 @@ class Model(ABC):
         Returns:
             Model: An instance of the model with the state restored.
         """
+        # This import needs to be here to avoid circular imports
         from autoop.core.ml.model import get_model
 
         model_data = pickle.loads(artifact.data)

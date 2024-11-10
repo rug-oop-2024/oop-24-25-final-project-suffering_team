@@ -43,9 +43,12 @@ if "new_predictions" in st.session_state:
 
 st.write("# ⚙ Modelling")
 write_helper_text(
-    "".join((
-        "In this section, you can design a ",
-        "machine learning pipeline to train a model on a dataset."))
+    "".join(
+        (
+            "In this section, you can design a ",
+            "machine learning pipeline to train a model on a dataset.",
+        )
+    )
 )
 
 automl = AutoMLSystem.get_instance()
@@ -66,7 +69,6 @@ name = st.selectbox(
 )
 
 if name is not None:
-    # This needs fixing as the storage deletes only the objects.
     st.write("## Delete dataset")
     if st.button("Delete dataset"):
         for dataset in datasets:
@@ -188,7 +190,6 @@ if selected_model and selected_metrics and selected_features:
         train_result = result["train_metrics"]
         test_result = result["test_metrics"]
         predictions = result["predictions"]
-        # Get the original labels
 
         st.write("## Last Executed Pipeline Results:")
 
@@ -240,7 +241,7 @@ if selected_model and selected_metrics and selected_features:
             (pipeline.name, pipeline.version) for pipeline in pipelines
         ):
             st.write(
-                "This name and version is already saved\n",
+                "This name and version is already saved  \n",
                 "Saved pipelines:",
                 ((pipeline.name, pipeline.version) for pipeline in pipelines),
             )
